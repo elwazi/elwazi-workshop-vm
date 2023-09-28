@@ -2,7 +2,7 @@
 
 Get repos
 ```
-git https://github.com/grbot/elwazi-workshop-vm-setup.git
+git clone https://github.com/grbot/elwazi-workshop-vm-setup.git
 ```
 Change to `elwazi-workshop-vm-setup` directory
 ```
