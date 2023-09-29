@@ -5,6 +5,7 @@ resource "local_file" "ansible_inventory" {
       floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
       passwords = [for password in random_password.password.*: password.result]
       ssh_public_key = var.ssh_key_public
+      admin_users = var.admin_users
     }
   )
   filename = "inventory.yaml.woot"
