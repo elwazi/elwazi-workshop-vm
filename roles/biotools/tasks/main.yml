@@ -1,0 +1,32 @@
+---
+- name: Install bio tools
+  tags: biotools
+  when: biotools_install is defined and biotools_install
+  block:
+    - name: Install samtools
+      block:
+        - name: Download samtools
+          get_url:
+            url: "https://github.com/samtools/samtools/releases/download/1.18/samtools-1.18.tar.bz2"
+            checksum: "sha256:d686ffa621023ba61822a2a50b70e85d0b18e79371de5adb07828519d3fc06e1"
+            dest: "/tmp/samtools-1.18.tar.bz2"
+        - name: Uncompress samtools
+          unarchive:
+            src: "/tmp/samtools-1.18.tar.bz2"
+            dest: "/tmp/"
+            remote_src: yes
+            creates: "/tmp/samtools-1.18"
+        - name: Configure samtools
+          command: "./configure --prefix=/usr/local"
+          args:
+              chdir: "/tmp/samtools-1.18"
+        - name: Build samtools
+          command: "make"
+          args:
+              chdir: "/tmp/samtools-1.18"
+        - name: Install samtools
+          command: "make install"
+          args:
+              chdir: "/tmp/samtools-1.18"
+
+
