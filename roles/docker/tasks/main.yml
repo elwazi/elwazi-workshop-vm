@@ -1,6 +1,4 @@
 ---
-# tasks file for roles/docker
-
 - name: Install docker things
   tags: docker
   when: docker_install is defined and docker_install

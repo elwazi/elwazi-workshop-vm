@@ -1,5 +1,4 @@
 ---
-# tasks file for roles/users
 - name: Add users and groups
   tags: admin_users
   block:

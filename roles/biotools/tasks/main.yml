@@ -28,5 +28,3 @@
           command: "make install"
           args:
               chdir: "/tmp/samtools-1.18"
-
-

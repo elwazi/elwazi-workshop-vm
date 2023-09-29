@@ -1,5 +1,4 @@
 ---
-# tasks file for roles/base
 - name: Install jupyter
   tags: jupyter
   when: jupyter_install is defined and jupyter_install
@@ -58,5 +57,3 @@
       become_user: "{{ workshop_usr }}"
       args:
          chdir: "/home/{{ workshop_usr }}"
-
-

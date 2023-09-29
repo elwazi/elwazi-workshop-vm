@@ -1,5 +1,4 @@
 ---
-# tasks file for roles/base
 - name: Install Nextflow
   tags: nextflow
   when: nextflow_install is defined and nextflow_install
@@ -10,5 +9,3 @@
         checksum: "sha512:90712d34ddedc9fae5fe75bc78bb333b6b3da864a089489df380ee313fbf312dd28d3094bc2ac67472f9fafb854d2bba2ff8f8dbafc01b6ef176ad8ea469b4f3"
         dest: "/usr/local/bin/nextflow"
         mode: u=rwx,g=rx,o=rx
-
-

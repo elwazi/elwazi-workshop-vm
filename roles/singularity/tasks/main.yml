@@ -1,5 +1,4 @@
 ---
-# tasks file for roles/base
 - name: Install singularity
   tags: singularity
   when: singularity_install is defined and singularity_install
