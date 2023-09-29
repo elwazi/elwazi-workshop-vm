@@ -20,6 +20,8 @@
           - 'git'
           - 'gnutls-bin'
           - 'python-is-python3'
+          - 'python3-pip'
+          - 'python3-virtualenv'
           - 'sssd'
           - 'ssl-cert'
           - 'wget'
