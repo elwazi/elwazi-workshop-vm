@@ -1,33 +1,37 @@
 ---
 # tasks file for roles/docker
 
-- name: Install aptitude using apt
-  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+- name: Install docker things
+  tags: docker
+  when: docker_install is defined and docker_install
+  block:
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-- name: Install required system packages
-  apt: name={{ item }} state=latest update_cache=yes
-  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+    - name: Install required system packages
+      apt:
+        name:
+          - 'apt-transport-https'
+          - 'ca-certificates'
+          - 'curl'
+          - 'software-properties-common'
+        state: latest
+        update_cache: yes
 
-- name: Add Docker GPG apt Key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
-- name: Add Docker Repository
-  apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu jammy stable
-    state: present
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
 
-- name: Update apt and install docker-ce
-  apt: update_cache=yes name=docker-ce state=latest
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
 
-- name: Make sure we have a 'docker' group
-  group:
-    name: docker
-    state: present
-- name: Add users to 'docker'' group
-  user:
-    name: "{{ item.username }}"
-    groups: docker
-    append: yes
-  with_items: "{{ users }}"
+    - name: Make sure we have a 'docker' group
+      group:
+        name: docker
+        state: present
