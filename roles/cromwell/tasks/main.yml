@@ -34,3 +34,16 @@
           #!/bin/bash
           java -jar /usr/local/bin/womtool-85.jar "$@"
         mode: u=rwx,go=rx
+
+    - name: Create cromshell virtual_environment
+      pip:
+        name: cromshell
+        virtualenv: /usr/local/bin/.cromshell_venv
+
+    - name: Create cromshell command
+      copy:
+        dest: /usr/local/bin/cromshell
+        content: |
+          #!/bin/bash
+          /usr/local/bin/.cromshell_venv/bin/cromshell "$@"
+        mode: u=rwx,go=rx
