@@ -1,34 +1,52 @@
 ---
-- name: Create user
-  user:
-    name: "{{ workshop_usr }}"
-    password: "{{ system_pass | password_hash('sha512') }}"
-    shell: /bin/bash
-    createhome: yes
+- name: Create workshop users
+  tags: workshop_users
+  block:
+    - name: Create user
+      user:
+        name: "{{ item.username }}"
+        password: "{{ item.password | password_hash('sha512') }}"
+        shell: /bin/bash
+        createhome: yes
+      with_items:
+        - "{{ workshop_users }}"
+      loop_control:
+        label: "{{ item.username }}"
 
-- name: Ensure homes are secure by default
-  file:
-    path: "/home/{{ workshop_usr }}"
-    mode: "u=rwx,g=,o="
+    - name: Ensure homes are secure by default
+      file:
+        path: "/home/{{ item.username }}"
+        mode: "u=rwx,g=,o="
+      with_items:
+        - "{{ workshop_users }}"
+      loop_control:
+        label: "{{ item.username }}"
 
-# Add user to sudo
-- name: Add sudoers users to wheel group
-  user:
-    name: "{{ workshop_usr }}"
-    groups: wheel
-    append: yes
 
-# Add to dockers group
-- name: Add user to 'docker'' group
-  user:
-    name: "{{ workshop_usr }}"
-    groups: docker
-    append: yes
+    ## Add user to sudo
+    #- name: Add sudoers users to wheel group
+    #  user:
+    #    name: "{{ workshop_usr }}"
+    #    groups: wheel
+    #    append: yes
 
-- name: Update SSH server configuration
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^PasswordAuthentication.*'
-    line: 'PasswordAuthentication yes'
-    state: present
-  notify: Restart SSH Service
+    # Add to dockers group
+    - name: Add user to 'docker' group
+      when: docker_install is defined and docker_install
+      user:
+        name: "{{ item.username }}"
+        groups: docker
+        append: yes
+      with_items:
+        - "{{ workshop_users }}"
+      loop_control:
+        label: "{{ item.username }}"
+
+
+    - name: Update SSH server configuration to allow password authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication.*'
+        line: 'PasswordAuthentication yes'
+        state: present
+      notify: Restart SSH Service
