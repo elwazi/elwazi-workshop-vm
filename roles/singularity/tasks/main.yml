@@ -1,0 +1,106 @@
+---
+# tasks file for roles/base
+- name: Install singularity
+  tags: singularity
+  when: singularity_install is defined and singularity_install
+  vars:
+    go: {version: "1.21.1", checksum: "sha256:b3075ae1ce5dab85f89bc7905d1632de23ca196bd8336afd93fa97434cfa55ae"}
+  block:
+    - name: Install golang
+      become: yes
+      tags:
+        - golang
+      block:
+        - name: Download go tarball
+          become: no
+          get_url:
+            url: "https://go.dev/dl/go{{ go.version }}.linux-amd64.tar.gz"
+            dest: "/tmp/go{{ go.version }}.linux-amd64.tar.gz"
+            checksum: "{{ go.checksum }}"
+        - name: Extract go to /opt
+          unarchive:
+            src: "/tmp/go{{ go.version }}.linux-amd64.tar.gz"
+            dest: /opt/
+            creates: /opt/go
+            remote_src: yes
+        - name: Add GO_PATH etc to environments
+          block:
+            - name: Add go binaries to PATH
+              lineinfile:
+                path: "{{ item }}"
+                state: present
+                create: yes
+                line: "export PATH=${PATH}:/opt/go/bin"
+                regexp: '^export PATH=${PATH}:/opt/go/bin$'
+              loop:
+                - /etc/zsh/zshenv
+                - /etc/profile.d/golang.sh
+            - name: add GOPATH to environment
+              lineinfile:
+                path: "{{ item }}"
+                state: present
+                create: yes
+                line: "export GOPATH=~/go"
+              loop:
+                - /etc/zsh/zshenv
+                - /etc/profile.d/golang.sh
+            - name: add GOPATH/bin to environment
+              lineinfile:
+                path: "{{ item }}"
+                state: present
+                create: yes
+                line: "export PATH=${PATH}:${GOPATH}/bin"
+              loop:
+                - /etc/zsh/zshenv
+                - /etc/profile.d/golang.sh
+    - name: Install Singularity
+      become: no
+      environment:  # necessary because go only added after facts were gathered
+        PATH: "{{ ansible_env.PATH }}:/opt/go/bin"
+      tags:
+        - singularity
+      vars:
+        singularity:
+          version: "4.0.0"
+          url: "https://github.com/sylabs/singularity/releases/download/v4.0.0/singularity-ce-4.0.0.tar.gz"
+          checksum: "sha256:4ef4e55138cc6ea3baece3cc677760abe7749fc74f679d9adf46a2e78eb181b9"
+      block:
+        - name: Download singularity {{ singularity.version }}
+          get_url:
+            url: "{{ singularity.url }}"
+            dest: "/tmp/singularity-{{ singularity.version }}.tar.gz"
+            checksum: "{{ singularity.checksum }}"
+        - name: Ensure singularity exists in GOPATH
+          file:
+            path: ~/go/src/github.com/sylabs
+            state: directory
+            mode: u=rwx,g=rx,o=
+            recurse: yes
+        - name: Extract singularity to GOPATH
+          unarchive:
+            src: "/tmp/singularity-{{ singularity.version }}.tar.gz"
+            dest: ~/go/src/github.com/sylabs
+            creates: "~/go/src/github.com/sylabs/singularity-ce-{{ singularity.version }}"
+            remote_src: yes
+        - name: run mconfig
+          command:
+            argv:
+              - ./mconfig
+    #          - --prefix=/opt/singularity
+            creates: "~/go/src/github.com/sylabs/singularity-ce-{{ singularity.version }}/builddir/Makefile"
+          args:
+            chdir: "~/go/src/github.com/sylabs/singularity-ce-{{ singularity.version }}"
+        - name: Make singularity
+          make:
+            chdir: "~/go/src/github.com/sylabs/singularity-ce-{{ singularity.version }}/builddir"
+            params:
+              NUM_THREADS: "{{ ansible_processor_vcpus }}"
+          environment:
+            MAKEFLAGS: "-j{{ ansible_processor_vcpus }}"
+        - name: "Install singularity"
+          make:
+            chdir: "~{{ ansible_user }}/go/src/github.com/sylabs/singularity-ce-{{ singularity.version }}/builddir"
+            target: install
+          become: yes
+          environment:
+            MAKEFLAGS: "-j{{ ansible_processor_vcpus }}"
