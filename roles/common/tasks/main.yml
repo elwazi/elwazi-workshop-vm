@@ -19,6 +19,7 @@
           - 'fail2ban'
           - 'git'
           - 'gnutls-bin'
+          - 'python-is-python3'
           - 'sssd'
           - 'ssl-cert'
           - 'wget'

@@ -1,0 +1,36 @@
+---
+- name: Install cromwell
+  tags: cromwell
+  when: cromwell_install is defined and cromwell_install
+  block:
+    - name: Ensure java is installed
+      apt:
+        name: openjdk-19-jre-headless
+        state: present
+
+    - name: Download cromwell
+      get_url:
+        url: https://github.com/broadinstitute/cromwell/releases/download/85/cromwell-85.jar
+        dest: /usr/local/bin/cromwell-85.jar
+        checksum: "sha512:e555a5a15d4262d7f7fec64bc5292dd7e55d0f9b35115a4d532581dbdb478a561948cd3c0bf52048247e4dcc8547cc776b7ecf8593533fdfffcbf35ef3a8b94b"
+        mode: u=rw,go=r
+    - name: Download womtool
+      get_url:
+        url: https://github.com/broadinstitute/cromwell/releases/download/85/womtool-85.jar
+        dest: /usr/local/bin/womtool-85.jar
+        mode: u=rw,go=r
+        checksum: "sha512:2fdcbd866e0d82a8030ce0b10a74a4ae3b52f03967ec1cb79d78d2e17ecf81332ae15ebb1e09411797497f4a5f4ccf66b894cd0b0945aee8451840a1f9259faa"
+    - name: Create cromwell command
+      copy:
+        dest: /usr/local/bin/cromwell
+        content: |
+          #!/bin/bash
+          java -jar /usr/local/bin/cromwell-85.jar "$@"
+        mode: u=rwx,go=rx
+    - name: Create womtool command
+      copy:
+        dest: /usr/local/bin/womtool
+        content: |
+          #!/bin/bash
+          java -jar /usr/local/bin/womtool-85.jar "$@"
+        mode: u=rwx,go=rx
