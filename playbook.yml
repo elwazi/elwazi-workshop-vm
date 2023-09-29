@@ -9,3 +9,7 @@
     - admin_users
     - workshop-user
     - jupyter
+    - singularity
+    - cromwell
+    - nextflow
+    - biotools
