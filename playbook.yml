@@ -2,10 +2,10 @@
 - hosts: all
   become: true
   roles:
-  - common
-  - base
-  - users
-  - docker
-  - docker-compose
-  - workshop-user
-  - jupyter
+    - base
+    - common
+    - docker
+    - docker-compose
+    - admin_users
+    - workshop-user
+    - jupyter
