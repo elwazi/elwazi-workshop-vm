@@ -1,43 +1,47 @@
 ---
 # tasks file for roles/common
 
-- name: apt upgrade existing packages
-  apt:
-    upgrade: safe
+- name: Common tasks
+  tags:
+    - common
+  block:
+    - name: apt upgrade existing packages
+      apt:
+        upgrade: safe
 
-- name: apt Install Common Packages
-  apt:
-    name:
-      - 'autofs'
-      - 'build-essential'
-      - 'curl'
-      - 'dhcpcd5'
-      - 'fail2ban'
-      - 'git'
-      - 'gnutls-bin'
-      - 'sssd'
-      - 'ssl-cert'
-      - 'wget'
-      - 'sqlite3'
+    - name: apt Install Common Packages
+      apt:
+        name:
+          - 'autofs'
+          - 'build-essential'
+          - 'curl'
+          - 'dhcpcd5'
+          - 'fail2ban'
+          - 'git'
+          - 'gnutls-bin'
+          - 'sssd'
+          - 'ssl-cert'
+          - 'wget'
+          - 'sqlite3'
 
-    state: latest
-    update_cache: yes
-  register: apt_res
-  retries: 3
-  delay: 15
-  until: apt_res is success
+        state: latest
+        update_cache: yes
+      register: apt_res
+      retries: 3
+      delay: 15
+      until: apt_res is success
 
-- name: apt remove unattended-upgrades
-  apt:
-    name:
-      - 'unattended-upgrades'
-    state: absent
-    update_cache: yes
-  register: apt_res
-  retries: 3
-  delay: 15
-  until: apt_res is success
+    - name: apt remove unattended-upgrades
+      apt:
+        name:
+          - 'unattended-upgrades'
+        state: absent
+        update_cache: yes
+      register: apt_res
+      retries: 3
+      delay: 15
+      until: apt_res is success
 
-- name: apt autoremove dependencies that are no longer required
-  apt:
-    autoremove: yes
+    - name: apt autoremove dependencies that are no longer required
+      apt:
+        autoremove: yes
