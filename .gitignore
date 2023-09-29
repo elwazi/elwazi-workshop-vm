@@ -3,3 +3,4 @@
 .terraform.lock.hcl
 *-openrc.sh
 terraform.tf*
+inventory.yaml
