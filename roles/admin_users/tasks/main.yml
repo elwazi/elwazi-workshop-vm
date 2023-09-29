@@ -1,0 +1,86 @@
+---
+# tasks file for roles/users
+- name: Add users and groups
+  tags: admin_users
+  block:
+    - name: Add groups
+      group:
+        name: "{{ item.username }}"
+        state: present
+        system: false
+      with_items:
+        - "{{ admin_users }}"
+      retries: 5
+      delay: 30
+      loop_control:
+        label: "{{ item.username }}"
+
+    - name: Add users
+      user:
+        name: "{{ item.username }}"
+        state: present
+        group: "{{ item.username }}"
+        groups: "{{ item.username }}"
+        append: yes
+        home: "/home/{{ item.username }}"
+        skeleton: /etc/skel
+        generate_ssh_key: no
+        shell: /bin/bash
+      with_items:
+        - "{{ admin_users }}"
+      retries: 5
+      delay: 30
+      loop_control:
+        label: "{{ item.username }}"
+
+    - name: Set ssh keys
+      authorized_key:
+        user: "{{ item.username }}"
+        state: present
+        key: "{{ item.ssh_key }}"
+      with_items:
+        - "{{ admin_users }}"
+      tags: "ssh_keys"
+      loop_control:
+        label: "{{ item.username }}"
+
+    - name: Ensure homes are secure by default
+      file:
+        path: "/home/{{ item.username }}"
+        mode: "u=rwx,g=,o="
+      with_items:
+        - "{{ admin_users }}"
+      loop_control:
+        label: "{{ item.username }}"
+
+    # Add all users to sudo and allow passwordless
+    - name: Make sure we have a 'wheel' group
+      group:
+        name: wheel
+        state: present
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+    - name: Add sudoers users to wheel group
+      user:
+        name: "{{ item.username }}"
+        groups: wheel
+        append: yes
+      with_items: "{{ admin_users }}"
+      loop_control:
+        label: "{{ item.username }}"
+
+    - name: Add user to 'docker' group
+      when: docker_install is defined and docker_install
+      user:
+        name: "{{ item.username }}"
+        groups: docker
+        append: yes
+      with_items:
+        - "{{ admin_users }}"
+      loop_control:
+        label: "{{ item.username }}"
