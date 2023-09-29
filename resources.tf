@@ -8,5 +8,6 @@ resource "local_file" "ansible_inventory" {
       admin_users = var.admin_users
     }
   )
-  filename = "inventory.yaml.woot"
+  filename = "inventory.yaml"
+  file_permission = "0660"
 }
