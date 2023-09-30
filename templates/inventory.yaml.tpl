@@ -5,9 +5,9 @@ workshop_servers:
       ansible_host: ${ floating_ips[index].address }
       private_ip: ${ node.network[0].fixed_ip_v4 }
       workshop_users:
-%{ for password_index, password in passwords ~}
-        - username: user${ password_index }
-          password: ${ password }
+%{ for user_count in range(1, users_per_server + 1) ~}
+        - username: ${ format("user%02s", index * users_per_server + user_count ) }
+          password: ${ passwords[index * users_per_server + user_count - 1] }
 %{ endfor ~}
 %{ endfor ~}
   vars:
