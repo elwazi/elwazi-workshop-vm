@@ -62,10 +62,10 @@ resource "openstack_compute_floatingip_associate_v2" "base" {
 
 resource "openstack_compute_instance_v2" "base" {
     count = var.server_count
-    name            = "${var.server_name}-${count.index + 1}"
+    name            = format("%s-%02s", var.server_name,count.index + 1)
     image_name      = var.server_image
     flavor_name     = var.server_flavor
-    key_pair        = "${openstack_compute_keypair_v2.terraform-key.name}"
+    key_pair        = openstack_compute_keypair_v2.terraform-key.name
     security_groups = ["default"]
 
     network {
