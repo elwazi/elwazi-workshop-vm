@@ -4,3 +4,4 @@
 *-openrc.sh
 terraform.tf*
 inventory.yaml
+users.tsv
