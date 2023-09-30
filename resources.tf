@@ -6,6 +6,7 @@ resource "local_file" "ansible_inventory" {
       passwords = [for password in random_password.password.*: password.result]
       ssh_public_key = var.ssh_key_public
       admin_users = var.admin_users
+      users_per_server = var.users_per_server
     }
   )
   filename = "inventory.yaml"
