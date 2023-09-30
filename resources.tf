@@ -12,3 +12,17 @@ resource "local_file" "ansible_inventory" {
   filename = "inventory.yaml"
   file_permission = "0660"
 }
+
+resource "local_file" "user_list" {
+  content = templatefile("templates/users.tsv.tpl",
+    {
+      workshop_servers = [for node in openstack_compute_instance_v2.base.*: node ]
+      floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
+      passwords = [for password in random_password.password.*: password.result]
+      admin_users = var.admin_users
+      users_per_server = var.users_per_server
+    }
+  )
+  filename = "users.tsv"
+  file_permission = "0660"
+}
