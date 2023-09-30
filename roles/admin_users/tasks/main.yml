@@ -7,6 +7,7 @@
         name: "{{ item.username }}"
         state: present
         system: false
+        gid: "{{ item.uid }}"
       with_items:
         - "{{ admin_users }}"
       retries: 5
@@ -25,6 +26,7 @@
         skeleton: /etc/skel
         generate_ssh_key: no
         shell: /bin/bash
+        uid: "{{ item.uid }}"
       with_items:
         - "{{ admin_users }}"
       retries: 5

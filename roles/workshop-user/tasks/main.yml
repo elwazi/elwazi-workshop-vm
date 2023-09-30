@@ -8,6 +8,7 @@
         password: "{{ item.password | password_hash('sha512') }}"
         shell: /bin/bash
         createhome: yes
+        uid: "{{ item.uid }}"
       with_items:
         - "{{ workshop_users }}"
       loop_control:
