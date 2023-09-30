@@ -74,15 +74,8 @@ resource "openstack_compute_instance_v2" "base" {
 }
 
 resource "random_password" "password" {
-  count            = var.users_per_server
+  count            = var.users_per_server * var.server_count
   length           = 16
   special          = true
   override_special = "_%@"
 }
-
-
-
-
-
-
-
