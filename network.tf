@@ -50,6 +50,7 @@ resource "openstack_compute_keypair_v2" "terraform-key" {
 }
 
 resource "openstack_networking_floatingip_v2" "base" {
+  description  = format("fip-%s-%02s", var.server_name,count.index + 1)
   pool = var.floating_ip_pool
   count = var.server_count
 }
