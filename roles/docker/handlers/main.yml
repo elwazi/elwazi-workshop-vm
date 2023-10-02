@@ -1,0 +1,7 @@
+---
+- name: restart docker
+  tags: docker
+  service:
+      name: docker
+      state: restarted
+      enabled: yes

@@ -33,3 +33,13 @@
       group:
         name: docker
         state: present
+
+    - name: Set docker MTU
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "mtu": 1420
+          }
+      notify:
+        - restart docker
