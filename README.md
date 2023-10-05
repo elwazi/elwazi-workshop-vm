@@ -34,8 +34,9 @@ $ pip install python-openstackclient
 Login to your openstack account and download your openstack rc file, say `MyProject-openrc.rc`.
 Source your openstack rc file:
 ```bash
-$ . MyProject-openrc.rc
+$ . ./MyProject-openrc.rc
 ````
+Note you will prompted for your password so have that ready.
 
 ## Initialise terraform
 
@@ -53,7 +54,7 @@ Create a file called `terraform.tfvars` for example:
 ```hcl terraform.tfvars
 ssh_key_public = "~/.ssh/id_rsa.pub"
 
-server_name = "elwazi-cww"
+server_name = "elwazi-something"
 
 server_count = 16
 users_per_server = 2
@@ -77,18 +78,19 @@ If you installed the openstack client you can find available images using:
 ```bash
 $ openstack image list
 ```
-Note that this has been developed and tested using an ubuntu jammy image…
+Note that you will need `server_count` available floating IP addresses, so consider this when
+you're deciding on the number of nodes to create. Also note that this has been developed and tested
+using an ubuntu jammy image…
 
 ## Run `terraform` to deploy the nodes
 ```bash
 $ terraform apply
 ```
 This will create an inventory file `inventory.yaml` that will be used by ansible to setup the nodes.
+There will also be a tab-separated file called `users.tsv` which has login details for each of the users.
 
 ## Run `ansible-playbook` to setup the nodes
 ```bash
 $ ansible-playbook -i inventory.yaml setup.yaml
 ```
 You can check the inventory file to find the IP addresses of the nodes.
-Terraform will also have created a tab-separated file called `users.tsv` which has login details
-for each of the users.
