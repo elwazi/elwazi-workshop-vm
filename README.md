@@ -15,6 +15,7 @@ $ cd elwazi-workshop-vm
 If you have pipenv installed you can simply use the supplied Pipfiles:
 ```bash
 $ pipenv sync
+$ pipenv shell
 ```
 
 Otherwise you can create a virtual environment and install ansible:
