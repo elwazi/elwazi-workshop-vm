@@ -56,3 +56,23 @@
     - name: apt autoremove dependencies that are no longer required
       apt:
         autoremove: yes
+
+- name: Install google cloud stuff
+  tags: [gsutil]
+  block:
+    - name: Add signed google cloud apt key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add google cloud apt repository
+      apt_repository:
+          repo: "deb https://packages.cloud.google.com/apt cloud-sdk main"
+          state: present
+
+    - name: Install google cloud cli
+      apt:
+        name:
+          - google-cloud-cli
+        state: latest
+        update_cache: yes
