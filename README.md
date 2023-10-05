@@ -1,102 +1,93 @@
-# Setting up the server (with terraform)
+# Setting up the server (with terraform and ansible)
 
-Get repos
-```
-git clone https://github.com/grbot/elwazi-workshop-vm-setup.git
-```
-Change to `elwazi-workshop-vm-setup` directory
-```
-cd elwazi-workshop-vm-setup
-```
-Check Terraform version
-```
-terraform -version
-Terraform v1.3.2
-```
-Clean up space if previous installation exists here
-```
-rm -rf  .terraform*
-rm -rf terraform.tfstate*
-```
-Initialise Terraform environment
-```
-terraform init
-```
-Need to have a file called `terraform.tfvars` , with information below. The information can be retrieved from the OpenStack dashboard drop down on the right, select RC File v3.
+## Requirements
 
-```
-# No need to change
-ssh_key_public      = "~/.ssh/id_rsa.pub"
-ssh_key_private     = "~/.ssh/id_rsa"
-# Replace from here on
-auth_url            = "XXX"
-project_domain_name = "XXX"
-user_domain_name    = "XXX"
-region              = "XXX"
-user_name           = "XXX"
-password            = "XXX"
-unique_network_name = "XXX"
-floating_ip_pool    = "XXX"
-server_name         = "XXX"   
-```
-A new key will be created `$server_name-key`. (If this already exist on the OpenStack dashboard remove it before continuing)
+Terraform, ansible and an account on an OpenStack cloud.
 
-In `instances.tf` can change the `image_name` and `flavor_id` . (This information can be retreived from OpenStack dashboard/ or OpeStack CLI).
+## Clone the repository
 
-Set the `count` to the amount of servers needed. Also need to set the same number in the floatingip and floatingip_associate section.
+```bash
+$ git clone https://github.com/elwazi/elwazi-workshop-vm.git
+$ cd elwazi-workshop-vm
+````
 
-Regarding naming
-
-If
-```
-count = 30
-name = "${var.server_name}-${count.index + 1}"
-```
-Thirty servers would be created each named e.g. `server-1`, `server-2` ... `server-30`
-
-Lets get the servers up.
-```
-terraform apply
+## Create a virtual environment with ansible installed
+If you have pipenv installed you can simply use the supplied Pipfiles:
+```bash
+$ pipenv sync
 ```
 
-# Setting up the packages and users (with ansible)
-
-Check Ansible version
-```
-ansible --version
-ansible 2.10.8
-```
-
-Now create a file to drive the Ansible installation
-
-First set OpenStack variables to be used in OpenStack CLI
-
-```
-export OS_USERNAME=username
-export OS_PASSWORD=password
-export OS_PROJECT_NAME=project_name
-export OS_PROJECT_DOMAIN_ID=project_domain
-export OS_USER_DOMAIN_ID=user_domain
-export OS_IDENTITY_API_VERSION=3
-export OS_AUTH_URL=auth_url
+Otherwise you can create a virtual environment and install ansible:
+```bash
+$ virtualenv .venv
+$ . ./.venv/bin/activate
+$ pip install ansible
 ```
 
-Then create file
-```
-for i in $(seq 1 30); do echo "user"$i;done > prep/users
-for i in $(seq 1 30); do p1=`pwgen -1`; p2=`pwgen -1`; echo -e $p1"\t"$p2;done > prep/passwords
-for i in $(seq 1 30); do echo "elwazi-workshop-"$i;done > prep/servers
-paste <(openstack server list --name elwazi-workshop -f json | jq '.[].Name' | sed 's/"//g') <(openstack server list --name elwazi-workshop -f json | jq '.[].Networks."cbio-net"[0]' | sed 's/"//g') <(openstack server list --name elwazi-workshop -f json | jq '.[].Networks."cbio-net"[1]' | sed 's/"//g') | sort -V -k 1 | grep -w -f prep/servers > prep/ips
-paste prep/users prep/ips prep/passwords > prep/all
+Optionally install the openstack client as well:
+```bash
+$ pip install python-openstackclient
 ```
 
-```
-rm -rf all-plays/
-./prep.sh prep/all
+## Download your openstack rc file and source it
+Login to your openstack account and download your openstack rc file, say `MyProject-openrc.rc`.
+Source your openstack rc file:
+```bash
+$ . MyProject-openrc.rc
+````
+
+## Initialise terraform
+
+```bash
+$ terraform init
 ```
 
-Now need to loop through above all for setting up machines
+## Setup the variables file
 
+The file has a list of variables that are used to setup the nodes together with a description
+and default values.
+
+Create a file called `terraform.tfvars` for example:
+
+```hcl terraform.tfvars
+ssh_key_public = "~/.ssh/id_rsa.pub"
+
+server_name = "elwazi-cww"
+
+server_count = 16
+users_per_server = 2
+server_flavor = "ilifu-C-30"
+
+server_image = "20230914-jammy"
+
+admin_users = [
+  {
+    username = "admin1"
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQ…"
+  },
+  {
+    username = "admin2"
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQ…"
+  },
+  
+]
 ```
-for i in $(seq 1 30); do echo all-plays/elwazi-workshop-$i; done | parallel "cd {}; ansible-playbook -i inventory.yaml playbook.yml > log.txt 2>&1"
+If you installed the openstack client you can find available images using:
+```bash
+$ openstack image list
 ```
+Note that this has been developed and tested using an ubuntu jammy image…
+
+## Run `terraform` to deploy the nodes
+```bash
+$ terraform apply
+```
+This will create an inventory file `inventory.yaml` that will be used by ansible to setup the nodes.
+
+## Run `ansible-playbook` to setup the nodes
+```bash
+$ ansible-playbook -i inventory.yaml setup.yaml
+```
+You can check the inventory file to find the IP addresses of the nodes.
+Terraform will also have created a tab-separated file called `users.tsv` which has login details
+for each of the users.
