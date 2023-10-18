@@ -1,0 +1,38 @@
+---
+# tasks file for nginx
+- name: Install nginx etc.
+  tags: [nginx]
+  when: jupyter_install is defined and jupyter_install
+  block:
+    - name: Ensure requirements are installed
+      apt:
+        name:
+          - curl
+          - gnupg2
+          - ca-certificates
+          - lsb-release
+          - debian-archive-keyring
+        state: latest
+    - name: Add nginx repo key
+      shell: "curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg"
+    - name: Add nginx stable repo
+      copy:
+        dest: /etc/apt/sources.list.d/nginx.list
+        content: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu {{ ansible_distribution_release }} nginx"
+    - name: Install nginx
+      apt:
+        name:
+          - nginx
+        state: latest
+        update_cache: yes
+
+    - name: Generate ssl certificates
+      command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ilifu.key -out /etc/ssl/private/ilifu.crt -subj "/C=ZA/ST=Western Cape/L=Cape Town/O=iDIA/CN=ilifu.ac.za"
+
+    - name: Add jupyter to nginx config
+      when: jupyter_install is defined and jupyter_install
+      tags: [ nginx ]
+      template:
+        src: jupyterhub.nginx.jinja
+        dest: /etc/nginx/conf.d/jupyterhub.conf
+      notify: restart nginx
