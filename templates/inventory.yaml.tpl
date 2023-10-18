@@ -21,9 +21,9 @@ workshop_servers:
         ssh_key: ${ user.public_key }
         uid: ${ index + 20000 }
 %{ endfor ~}
-    cromwell_install: true
-    docker_install: true
-    jupyter_install: false
-    singularity_install: true
-    nextflow_install: true
-    biotools_install: true
+    cromwell_install: ${ install.cromwell }
+    docker_install: ${ install.docker }
+    jupyter_install: ${ install.jupyter }
+    singularity_install: ${ install.singularity }
+    nextflow_install: ${ install.nextflow }
+    biotools_install: ${ install.biotools }

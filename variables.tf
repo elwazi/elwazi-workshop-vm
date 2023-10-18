@@ -34,3 +34,33 @@ variable "admin_users" {
     }
   ]
 }
+
+variable "install_biotools" {
+  type = bool
+  default = false
+}
+
+variable "install_cromwell" {
+  type = bool
+  default = true
+}
+
+variable "install_docker" {
+  type = bool
+  default = true
+}
+
+variable "install_jupyter" {
+  type = bool
+  default = false
+}
+
+variable "install_nextflow" {
+  type = bool
+  default = true
+}
+
+variable "install_singularity" {
+  type = bool
+  default = true
+}
