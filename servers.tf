@@ -4,7 +4,7 @@ resource "openstack_compute_instance_v2" "base" {
     image_name      = var.server_image
     flavor_name     = var.server_flavor
     key_pair        = openstack_compute_keypair_v2.terraform-key.name
-    security_groups = ["default"]
+    security_groups = ["default", openstack_networking_secgroup_v2.workshop_security.name]
 
     network {
       name = openstack_networking_network_v2.workshop_network.name
