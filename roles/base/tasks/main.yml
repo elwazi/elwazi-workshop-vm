@@ -40,7 +40,7 @@
         group: root
         mode: 0644
 
-    - name: start and enable service
+    - name: start and enable fail2ban service
       systemd:
         name: fail2ban
         state: started
@@ -51,7 +51,7 @@
         - fail2ban-start-enable-service
       when: ansible_service_mgr == 'systemd'
 
-    - name: start and enable service
+    - name: start and enable fail2ban service
       service:
         name: fail2ban
         state: started
