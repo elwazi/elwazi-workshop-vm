@@ -52,7 +52,7 @@ variable "install_docker" {
 
 variable "install_jupyter" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "install_nextflow" {

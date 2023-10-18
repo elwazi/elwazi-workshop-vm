@@ -1,0 +1,11 @@
+---
+
+- name: Enable and start jupyterhub service
+  become: yes
+  become_user: root
+  tags: [restartjupyterhub]
+  systemd:
+    daemon_reload: yes
+    name: jupyterhub
+    state: restarted
+    enabled: yes

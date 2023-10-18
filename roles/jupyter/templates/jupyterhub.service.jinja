@@ -1,0 +1,21 @@
+[Unit]
+Description=Jupyterhub
+After=syslog.target network.target
+
+[Service]
+User={{ jupyterhub_user }}
+Group={{ jupyterhub_group }}
+Environment="PATH={{ jupyterhub_dir }}/.venv/bin:{{ slurm_root }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin"
+Environment="SLURM_INCLUDE_DIR={{ slurm_root }}/include"
+Environment="SLURM_LIB_DIR={{ slurm_root }}/lib"
+ExecStart={{ jupyterhub_dir }}/.venv/bin/jupyterhub -f {{ jupyterhub_dir }}/jupyterhub_config.py
+WorkingDirectory={{ jupyterhub_dir }}
+KillMode=process
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=jupyterhub
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
