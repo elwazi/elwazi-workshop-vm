@@ -1,0 +1,30 @@
+---
+# vars file for jupyter
+# jupyterhub user and group names
+jupyterhub_user: "jupyterhub"
+jupyterhub_group: "jupyterhub"
+jupyterhub_dir: "/opt/jupyterhub"
+jupyter_log_dir: "/var/log/jupyter"
+slurm_root: "/opt/slurm"
+jupyter_keycloak_client: "jupyter"
+
+# vars file for jupyter
+nodejs_version: 19
+configurable_http_proxy_version: 4.5.4
+
+# should have /bin/pipenv
+python_dir: '/software/common/python/3.11.2'
+
+# jupyterhub settings  # TODO: Fix hard coded hub_private_ip
+jupyterhub:
+  log_level: DEBUG
+  idle_timeout_seconds: 64800
+  idle_cull_check_frequency_seconds: 300
+  spawner_debug: True
+  http_timeout: 120
+  poll_interval: 180
+  job_runtime: "5-00:00:00"
+  job_partition: "Jupyter"
+  job_memory: "4gb"
+  job_nprocs: 4
+  admin_group_name: idia-admins

@@ -1,59 +1,147 @@
 ---
-- name: Install jupyter
-  tags: jupyter
+- name: Install JupyterHub and JupyterLab
+  tags: [jupyter]
   when: jupyter_install is defined and jupyter_install
   block:
-    - name: Install Python 3
-      apt:
-        name: python3
-        state: present
+    - name: Check nodejs version
+      tags: [ nodejs,build ]
+      command: "node -v"
+      register: nodejs_version_check
+      ignore_errors: True
+    - name: Install nodejs block
+      tags: [ nodejs,build ]
+      become: yes
+      vars:
+        nodejs_version_string: "v{{ nodejs_version }}."
+      when: nodejs_version_check.rc != 0 or nodejs_version_string not in nodejs_version_check.stdout
+      block:
+        - name: Download nodejs debian repo script
+          get_url:
+            url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+            dest: "/tmp/setup_{{ nodejs_version }}.x"
+            mode: 0755
 
-    - name: Install pip
-      apt:
-        name: python3-pip
-        state: present
+        - name: Add nodejs debian repo
+          command: "/tmp/setup_{{ nodejs_version }}.x"
 
-    - name: Install Jupyter Notebook
+        - name: remove temp setup script
+          file:
+            path: "/tmp/setup_{{ nodejs_version }}.x"
+            state: absent
+
+        - name: install nodejs
+          apt:
+            update_cache: yes
+            name:
+              - nodejs
+            state: latest
+          tags: [ installnodejs ]
+
+    - name: install configurable-http-proxy using npm
+      npm:
+        name: configurable-http-proxy
+        global: yes
+        version: "{{ configurable_http_proxy_version }}"
+      tags: [npm]
+      notify: Enable and start jupyterhub service
+
+    - name: Ensure Jupyterhub group exists
+      tags: [build]
+      become: yes
+      group:
+        name: "{{ jupyterhub_user }}"
+        state: present
+        system: yes
+
+    - name: Ensure jupyterhub user exists
+      tags: [build]
+      become: yes
+      user:
+        name: "{{ jupyterhub_group }}"
+        home: "{{ jupyterhub_dir }}"
+        groups: shadow,{{ jupyterhub_user }}
+        shell: "/bin/bash"
+        state: present
+        system: yes
+
+    - name: Ensure jupyterhub user home dir has correct perms
+      tags: [build]
+      become: yes
+      file:
+          path: "{{ jupyterhub_dir }}"
+          state: directory
+          owner: "{{ jupyterhub_user }}"
+          group: "{{ jupyterhub_group }}"
+          mode: "u=rwx,g=rx,o=rx"
+
+
+    - name: Ensure pipenv is installed for user {{ jupyterhub_user }}
+      tags: [ pipenv ]
+      become: yes
+      become_user: "{{ jupyterhub_user }}"
       pip:
-        name: jupyter
-        state: present
+        name: pipenv
         executable: pip3
+        extra_args: "--user"
 
-    - name: Configure Jupyter Notebook
-      command: jupyter notebook --generate-config
-      become: true
-      args:
-        creates: ~/.jupyter/jupyter_notebook_config.py
-      become_user: "{{ workshop_usr }}"
+    - name: Setup jupyterhub/notebook virtualenv
+      tags: [pipenv,build]
+      become: yes
+      become_user: "{{ jupyterhub_user }}"
+      block:
+        - name: Copy pipenv files to {{ jupyterhub_dir }}
+          copy:
+            src: "{{ item }}"
+            dest: "{{ jupyterhub_dir }}/"
+            mode: "u=rw,g=r,o=r"
+          with_items:
+            - Pipfile
+            - Pipfile.lock
+          register: pipenv_change
+        - name: "Setup {{ jupyterhub_user }}'s python environment using pipenv"
+          command: "~/.local/bin/pipenv sync"
+          args:
+            chdir: "{{ jupyterhub_dir }}"
+          environment:
+            PIPENV_VENV_IN_PROJECT: 1
+            PATH: "{{ python_dir }}/bin:{{ ansible_env.PATH }}"
+            SLURM_INCLUDE_DIR: "{{ slurm_root }}/include"
+            SLURM_LIB_DIR: "{{ slurm_root }}/lib"
+          notify: Enable and start jupyterhub service
+        - name: Setup jupyterhub/notebook config files
+          tags: [config]
+          template:
+            src: "{{ item.src }}"
+            dest: "{{ jupyterhub_dir }}/{{ item.dest }}"
+            owner: "{{ jupyterhub_user }}"
+            group: "{{ jupyterhub_user }}"
+          with_items:
+            - src: jupyterhub_config.py.jinja
+              dest: "jupyterhub_config.py"
+            - src: jupyter_lab_config.py.jinja
+              dest: "jupyter_lab_config.py"
+          notify: Enable and start jupyterhub service
+        - name: Add jupyterhub service file to systemd
+          become: yes
+          become_user: root
+          template:
+            src: jupyterhub.service.jinja
+            dest: /etc/systemd/system/jupyterhub.service
+          notify:
+            - Enable and start jupyterhub service
+        - name: "Allow {{ jupyterhub_user }} to run sudospawner command"
+          become: yes
+          become_user: root
+          community.general.sudoers:
+            name: jupyterhub
+            user: "{{ jupyterhub_user }}"
+            runas: "ALL"
+            nopassword: yes
+            setenv: true
+            commands:
+              - "{{ jupyterhub_dir }}/.venv/bin/sudospawner"
 
-    - name: Set Jupyter Notebook password
-      become: true
-      command: >
-        python3 -c "from notebook.auth import passwd; print(passwd('{{ jupyter_pass }}'))"
-      register: hashed_password
-      become_user: "{{ workshop_usr }}"
+          tags: [ sudoers ]
 
-    - name: Update Jupyter Notebook config file
-      become: true
-      lineinfile:
-        dest: ~/.jupyter/jupyter_notebook_config.py
-        line: "c.NotebookApp.password = '{{ hashed_password.stdout }}'"
-        state: present
-      become_user: "{{ workshop_usr }}"
 
-    - name: Allow Jupyter Notebook connections from all IP addresses
-      become: true
-      lineinfile:
-        dest: ~/.jupyter/jupyter_notebook_config.py
-        line: "c.NotebookApp.ip = '{{ local_ip }}'"
-        state: present
-      become_user: "{{ workshop_usr }}"
 
-    - name: Start Jupyter Notebook service
-      become: true
-      command: jupyter notebook --port={{ jupyter_port }} --no-browser
-      async: 2419200 ## four weeks
-      poll: 0
-      become_user: "{{ workshop_usr }}"
-      args:
-         chdir: "/home/{{ workshop_usr }}"
