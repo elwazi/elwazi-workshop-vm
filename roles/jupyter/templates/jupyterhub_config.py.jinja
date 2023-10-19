@@ -186,6 +186,7 @@ c = get_config()  #noqa
 #              Use JupyterHub.bind_url
 #  Default: '/'
 # c.JupyterHub.base_url = '/'
+c.JupyterHub.base = '/jupyter'
 
 ## The public facing URL of the whole JupyterHub application.
 #
@@ -207,7 +208,7 @@ c = get_config()  #noqa
 #          The Hub should be able to resume from database state.
 #  Default: True
 # c.JupyterHub.cleanup_proxy = True
-c.JupyterHub.cleanup_proxy = False
+c.JupyterHub.cleanup_proxy = True
 
 ## Whether to shutdown single-user servers when the Hub shuts down.
 #
@@ -220,7 +221,7 @@ c.JupyterHub.cleanup_proxy = False
 #          The Hub should be able to resume from database state.
 #  Default: True
 # c.JupyterHub.cleanup_servers = True
-c.JupyterHub.cleanup_servers = False
+c.JupyterHub.cleanup_servers = True
 
 ## Maximum number of concurrent users that can be spawning at a time.
 #
