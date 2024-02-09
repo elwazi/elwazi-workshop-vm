@@ -34,3 +34,41 @@ resource "local_file" "user_list" {
   filename = "users.tsv"
   file_permission = "0660"
 }
+
+resource "local_file" "group_vars_slurm" {
+  content = templatefile("templates/group_vars_ceph.tpl",
+    {
+      ceph_mounts = {
+        home: {
+          name: "home"
+          mount_point: "/users"
+          export_locations: openstack_sharedfilesystem_share_v2.home_share.export_locations,
+          access: openstack_sharedfilesystem_share_access_v2.home_share_access_rw.access_key,
+          access_to: openstack_sharedfilesystem_share_access_v2.home_share_access_rw.access_to
+        }
+        software: {
+          name: "software"
+          mount_point: "/software"
+          export_locations: openstack_sharedfilesystem_share_v2.software_share.export_locations,
+          access: openstack_sharedfilesystem_share_access_v2.software_share_access_rw.access_key,
+          access_to: openstack_sharedfilesystem_share_access_v2.software_share_access_rw.access_to
+        }
+        scratch: {
+          name: "scratch"
+          mount_point: "/scratch"
+          export_locations: openstack_sharedfilesystem_share_v2.scratch_share.export_locations,
+          access: openstack_sharedfilesystem_share_access_v2.scratch_share_access_rw.access_key,
+          access_to: openstack_sharedfilesystem_share_access_v2.scratch_share_access_rw.access_to
+        }
+        software: {
+          name: "data"
+          mount_point: "/data"
+          export_locations: openstack_sharedfilesystem_share_v2.data_share.export_locations,
+          access: openstack_sharedfilesystem_share_access_v2.data_share_access_rw.access_key,
+          access_to: openstack_sharedfilesystem_share_access_v2.data_share_access_rw.access_to
+        }
+      }
+    }
+  )
+  filename = "group_vars/ceph.yml"
+}

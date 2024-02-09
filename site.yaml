@@ -1,0 +1,53 @@
+---
+# file: site.yaml
+
+- hosts: all
+  roles:
+    - base
+    - common
+    - storage
+    - admin_users
+    - workshop-user
+    -
+
+#- hosts: base
+#  roles:
+#    - base
+#  tags: ['base', 'build']
+#
+#- hosts: base, slurm, ldap_server
+#  roles:
+#    - common
+#    - hosts
+#
+#- hosts: ldap
+#  roles:
+#    - ldap_server
+#
+#- hosts: slurm_headnode, slurm_controller, slurm_compute
+#  roles:
+#    - ldap_client
+#
+#- hosts: slurm_headnode, slurm_compute
+#  roles:
+#    - ceph
+#
+#- hosts: slurm
+#  roles:
+#    - slurm_common
+#
+#- hosts: slurm_database
+#  roles:
+#    - db_server
+#
+#- hosts: slurm_controller
+#  roles:
+#    - slurm_controller
+#
+#- hosts: slurm_headnode
+#  roles:
+#    - slurm_headnode
+#
+#- hosts: slurm_compute
+#  roles:
+#    - slurm_worker
