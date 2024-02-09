@@ -9,6 +9,7 @@
         shell: /bin/bash
         createhome: yes
         uid: "{{ item.uid }}"
+        home: "/users/{{ item.username }}"
       with_items:
         - "{{ workshop_users }}"
       loop_control:
@@ -16,22 +17,13 @@
 
     - name: Ensure homes are secure by default
       file:
-        path: "/home/{{ item.username }}"
+        path: "/users/{{ item.username }}"
         mode: "u=rwx,g=,o="
       with_items:
         - "{{ workshop_users }}"
       loop_control:
         label: "{{ item.username }}"
 
-
-    ## Add user to sudo
-    #- name: Add sudoers users to wheel group
-    #  user:
-    #    name: "{{ workshop_usr }}"
-    #    groups: wheel
-    #    append: yes
-
-    # Add to dockers group
     - name: Add user to 'docker' group
       when: docker_install is defined and docker_install
       user:
