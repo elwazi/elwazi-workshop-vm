@@ -2,6 +2,8 @@
 # tasks file for storage
 
 - name: Ensure ceph software is installed
+  become: yes
+  become_user: root
   apt:
     name: ceph-common
   tags: ['ceph', 'cephfs', 'build']
