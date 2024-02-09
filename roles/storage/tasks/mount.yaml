@@ -2,6 +2,7 @@
 - name: Configure ceph
   tags: ['ceph', 'cephfs']
   become: yes
+  become_user: root
   vars:
     mount_name: "{{ item.name }}"
     mount_location: "{{ item.export_locations[0] }}"
