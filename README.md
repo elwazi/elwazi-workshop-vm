@@ -91,6 +91,6 @@ There will also be a tab-separated file called `users.tsv` which has login detai
 
 ## Run `ansible-playbook` to setup the nodes
 ```bash
-$ ansible-playbook -i inventory.yaml setup.yaml
+$ ansible-playbook -i inventory.yaml site.yaml  # --extra-vars "reboot_after_update=yes"
 ```
 You can check the inventory file to find the IP addresses of the nodes.
