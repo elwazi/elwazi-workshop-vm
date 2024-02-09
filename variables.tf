@@ -64,3 +64,23 @@ variable "install_singularity" {
   type = bool
   default = true
 }
+
+variable "home_share_size_gb" {
+  type = number
+  default = 20
+}
+
+variable "scratch_share_size_gb" {
+  type = number
+  default = 1024
+}
+
+variable "software_share_size_gb" {
+  type = number
+  default = 40
+}
+
+variable "data_share_size_gb" {
+  type = number
+  default = 100
+}
