@@ -3,6 +3,8 @@
 - name: Install nginx etc.
   tags: [nginx]
   when: jupyter_install is defined and jupyter_install
+  become: yes
+  become_user: root
   block:
     - name: Ensure requirements are installed
       apt:

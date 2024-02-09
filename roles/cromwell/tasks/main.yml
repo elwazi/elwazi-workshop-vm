@@ -2,6 +2,8 @@
 - name: Install cromwell
   tags: cromwell
   when: cromwell_install is defined and cromwell_install
+  become: yes
+  become_user: root
   block:
     - name: Ensure java is installed
       apt:

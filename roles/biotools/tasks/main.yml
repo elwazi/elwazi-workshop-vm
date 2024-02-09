@@ -2,6 +2,8 @@
 - name: Install bio tools
   tags: biotools
   when: biotools_install is defined and biotools_install
+  become: yes
+  become_user: root
   block:
     - name: Install samtools
       block:

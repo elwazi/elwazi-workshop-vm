@@ -2,6 +2,8 @@
 - name: Install JupyterHub and JupyterLab
   tags: [jupyter]
   when: jupyter_install is defined and jupyter_install
+  become: yes
+  become_user: root
   block:
     - name: Check nodejs version
       tags: [ nodejs,build ]

@@ -1,6 +1,8 @@
 ---
 - name: Create workshop users
   tags: workshop_users
+  become: yes
+  become_user: root
   block:
     - name: Create user
       user:

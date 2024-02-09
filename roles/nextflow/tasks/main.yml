@@ -2,6 +2,8 @@
 - name: Install Nextflow
   tags: nextflow
   when: nextflow_install is defined and nextflow_install
+  become: yes
+  become_user: root
   block:
     - name: Download nextflow
       get_url:
