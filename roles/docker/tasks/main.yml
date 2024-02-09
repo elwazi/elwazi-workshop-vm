@@ -2,6 +2,8 @@
 - name: Install docker things
   tags: docker
   when: docker_install is defined and docker_install
+  become: yes
+  become_user: root
   block:
     - name: Install aptitude using apt
       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
