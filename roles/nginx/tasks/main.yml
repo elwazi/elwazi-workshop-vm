@@ -33,8 +33,17 @@
 
     - name: Add jupyter to nginx config
       when: jupyter_install is defined and jupyter_install
-      tags: [ nginx ]
+      tags: [ nginx, jupyter ]
       template:
         src: jupyterhub.nginx.jinja
-        dest: /etc/nginx/conf.d/jupyterhub.conf
+        dest: /etc/nginx/sites-available/jupyterhub.conf
+      notify: restart nginx
+
+    - name: Create symlink for jupyter nginx site
+      when: jupyter_install is defined and jupyter_install
+      tags: [ nginx, jupyter ]
+      file:
+          src: /etc/nginx/sites-available/jupyterhub.conf
+          dest: /etc/nginx/sites-enabled/jupyterhub.conf
+          state: link
       notify: restart nginx
