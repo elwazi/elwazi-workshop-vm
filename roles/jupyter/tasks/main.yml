@@ -142,6 +142,3 @@
               - "{{ jupyterhub_dir }}/.venv/bin/sudospawner"
 
           tags: [ sudoers ]
-
-
-
