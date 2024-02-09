@@ -2,6 +2,8 @@
 - name: Common tasks
   tags:
     - common
+  become: yes
+  become_user: root
   block:
     - name: apt upgrade existing packages
       apt:
@@ -59,6 +61,8 @@
 
 - name: Install google cloud stuff
   tags: [gsutil]
+  become: yes
+  become_user: root
   block:
     - name: Add signed google cloud apt key
       apt_key:
