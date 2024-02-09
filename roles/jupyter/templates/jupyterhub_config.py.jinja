@@ -186,7 +186,7 @@ c = get_config()  #noqa
 #              Use JupyterHub.bind_url
 #  Default: '/'
 # c.JupyterHub.base_url = '/'
-c.JupyterHub.base = '/jupyter'
+# c.JupyterHub.base = '/jupyter'
 
 ## The public facing URL of the whole JupyterHub application.
 #
@@ -194,6 +194,7 @@ c.JupyterHub.base = '/jupyter'
 #          Sets protocol, ip, base_url
 #  Default: 'http://:8000'
 # c.JupyterHub.bind_url = 'http://:8000'
+c.JupyterHub.bind_url = 'http://:8000/jupyter'
 
 ## Whether to shutdown the proxy when the Hub shuts down.
 #
