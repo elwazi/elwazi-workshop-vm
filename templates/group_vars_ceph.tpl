@@ -1,4 +1,5 @@
 ---
+ceph_mounts:
 %{ for mount in ceph_mounts ~}
   - ${ mount.name }:
     name: "${ mount.name }"

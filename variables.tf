@@ -5,6 +5,14 @@ variable "floating_ip_pool" {
   type = string
   default = "Ext_Floating_IP"
 }
+variable "ceph_net_name" {
+  type = string
+  default="Ceph-net"
+}
+variable "ceph_subnet_name" {
+  type = string
+  default="Ceph-subnet"
+}
 variable "server_name" {
   type = string
   default = "elwazi-workshop"

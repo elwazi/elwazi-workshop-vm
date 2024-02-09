@@ -9,6 +9,9 @@ resource "openstack_compute_instance_v2" "base" {
     network {
       name = openstack_networking_network_v2.workshop_network.name
     }
+    network {
+      name = data.openstack_networking_network_v2.ceph_net.name
+    }
 }
 
 resource "random_password" "password" {

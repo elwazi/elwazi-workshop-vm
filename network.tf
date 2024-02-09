@@ -1,3 +1,11 @@
+data "openstack_networking_network_v2" "ceph_net" {
+  name = var.ceph_net_name
+}
+
+data "openstack_networking_subnet_v2" "ceph_subnet" {
+  name = var.ceph_subnet_name
+}
+
 resource "openstack_networking_network_v2" "workshop_network" {
     name = "${var.server_name}-net"
     admin_state_up = "true"
