@@ -60,7 +60,7 @@ resource "local_file" "group_vars_slurm" {
           access: openstack_sharedfilesystem_share_access_v2.scratch_share_access_rw.access_key,
           access_to: openstack_sharedfilesystem_share_access_v2.scratch_share_access_rw.access_to
         }
-        software: {
+        data: {
           name: "data"
           mount_point: "/data"
           export_locations: openstack_sharedfilesystem_share_v2.data_share.export_locations,
