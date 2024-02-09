@@ -15,12 +15,12 @@
           - lsb-release
           - debian-archive-keyring
         state: latest
-    - name: Add nginx repo key
-      shell: "curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg"
-    - name: Add nginx stable repo
-      copy:
-        dest: /etc/apt/sources.list.d/nginx.list
-        content: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu {{ ansible_distribution_release }} nginx"
+#    - name: Add nginx repo key
+#      shell: "curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg"
+#    - name: Add nginx stable repo
+#      copy:
+#        dest: /etc/apt/sources.list.d/nginx.list
+#        content: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu {{ ansible_distribution_release }} nginx"
     - name: Install nginx
       apt:
         name:
