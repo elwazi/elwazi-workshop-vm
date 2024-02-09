@@ -70,5 +70,5 @@ resource "local_file" "group_vars_slurm" {
       }
     }
   )
-  filename = "group_vars/ceph.yml"
+  filename = "group_vars/all/ceph.yml"
 }
