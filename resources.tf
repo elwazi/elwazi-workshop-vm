@@ -2,7 +2,7 @@ resource "local_file" "ansible_inventory" {
   content = templatefile("templates/inventory.yaml.tpl",
     {
       workshop_servers = [for node in openstack_compute_instance_v2.base.*: node ]
-      floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
+      floating_ip = openstack_networking_floatingip_v2.login.address
       passwords = [for password in random_password.password.*: password.result]
       ssh_public_key = var.ssh_key_public
       admin_users = var.admin_users
@@ -25,8 +25,10 @@ resource "local_file" "user_list" {
   content = templatefile("templates/users.tsv.tpl",
     {
       workshop_servers = [for node in openstack_compute_instance_v2.base.*: node ]
-      floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
+      # floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
+      ips = [for address in openstack_compute_instance_v2.base.* : address.access_ip_v4]
       passwords = [for password in random_password.password.*: password.result]
+      admin_passwords = [for password in random_password.admin_password.*: password.result]
       admin_users = var.admin_users
       users_per_server = var.users_per_server
     }
@@ -35,7 +37,7 @@ resource "local_file" "user_list" {
   file_permission = "0660"
 }
 
-resource "local_file" "group_vars_slurm" {
+resource "local_file" "group_vars_ceph" {
   content = templatefile("templates/group_vars_ceph.tpl",
     {
       ceph_mounts = {
@@ -71,4 +73,15 @@ resource "local_file" "group_vars_slurm" {
     }
   )
   filename = "group_vars/all/ceph.yml"
+}
+
+resource "local_file" "group_vars_users" {
+  content = templatefile("templates/group_vars_users.yaml.tpl",
+    {
+      passwords = [for password in random_password.password.*: password.result]
+      admin_users = var.admin_users
+
+    }
+  )
+  filename = "group_vars/all/users.yml"
 }
