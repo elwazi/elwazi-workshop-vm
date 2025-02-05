@@ -67,14 +67,24 @@ resource "openstack_compute_keypair_v2" "terraform-key" {
   public_key = "${file(var.ssh_key_public)}"
 }
 
-resource "openstack_networking_floatingip_v2" "base" {
-  description  = format("fip-%s-%02s", var.server_name,count.index + 1)
+# resource "openstack_networking_floatingip_v2" "base" {
+#   description  = format("fip-%s-%02s", var.server_name,count.index + 1)
+#   pool = var.floating_ip_pool
+#   count = var.server_count
+# }
+#
+# resource "openstack_compute_floatingip_associate_v2" "base" {
+#   count = var.server_count
+#   floating_ip = openstack_networking_floatingip_v2.base[count.index].address
+#   instance_id = openstack_compute_instance_v2.base[count.index].id
+# }
+
+resource "openstack_networking_floatingip_v2" "login" {
+  description  = format("fip-%s", var.server_name)
   pool = var.floating_ip_pool
-  count = var.server_count
 }
 
-resource "openstack_compute_floatingip_associate_v2" "base" {
-  count = var.server_count
-  floating_ip = openstack_networking_floatingip_v2.base[count.index].address
-  instance_id = openstack_compute_instance_v2.base[count.index].id
+resource "openstack_compute_floatingip_associate_v2" "login" {
+  floating_ip = openstack_networking_floatingip_v2.login.address
+  instance_id = openstack_compute_instance_v2.login.id
 }
