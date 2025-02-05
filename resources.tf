@@ -26,6 +26,7 @@ resource "local_file" "user_list" {
     {
       workshop_servers = [for node in openstack_compute_instance_v2.base.*: node ]
       # floating_ips = [for address in openstack_networking_floatingip_v2.base.* : address]
+      floating_ip = openstack_networking_floatingip_v2.login.address
       ips = [for address in openstack_compute_instance_v2.base.* : address.access_ip_v4]
       passwords = [for password in random_password.password.*: password.result]
       admin_passwords = [for password in random_password.admin_password.*: password.result]
