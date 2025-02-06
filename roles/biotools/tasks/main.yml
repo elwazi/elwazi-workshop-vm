@@ -22,14 +22,17 @@
           command: "./configure --prefix=/usr/local"
           args:
               chdir: "/tmp/samtools-1.21"
+              creates: "/tmp/samtools-1.21/Makefile"
         - name: Build samtools
           command: "make"
           args:
               chdir: "/tmp/samtools-1.21"
+              creates: "/tmp/samtools-1.21/samtools"
         - name: Install samtools
           command: "make install"
           args:
               chdir: "/tmp/samtools-1.21"
+              creates: "/usr/local/bin/samtools"
     - name: Install bcftools
       block:
         - name: Download bcftools
@@ -47,14 +50,17 @@
           command: "./configure --prefix=/usr/local"
           args:
               chdir: "/tmp/bcftools-1.21"
+              creates: "/tmp/bcftools-1.21/Makefile"
         - name: Build bcftools
           command: "make"
           args:
               chdir: "/tmp/bcftools-1.21"
+              creates: "/tmp/bcftools-1.21/bcftools"
         - name: Install bcftools
           command: "make install"
           args:
               chdir: "/tmp/bcftools-1.21"
+              creates: "/usr/local/bin/bcftools"
     - name: Install htslib
       block:
         - name: Download htslib
@@ -72,12 +78,51 @@
           command: "./configure --prefix=/usr/local"
           args:
             chdir: "/tmp/htslib-1.21"
+            creates: "/tmp/htslib-1.21/Makefile"
         - name: Build htslib
           command: "make"
           args:
             chdir: "/tmp/htslib-1.21"
+            creates: "/tmp/htslib-1.21/tabix"
         - name: Install htslib
           command: "make install"
           args:
             chdir: "/tmp/htslib-1.21"
+            creates: "/usr/local/bin/tabix"
+    - name: Install gatk
+      block:
+        - name: Download gatk source
+          get_url:
+            url: https://github.com/broadinstitute/gatk/releases/download/4.6.1.0/gatk-4.6.1.0.zip
+            checksum: "sha256:ac7015c3f0ef1852745ca0ef647adbf8ddef5db63ab485b00bc1ffe654814155"
+            dest: /opt/gatk-4.6.1.0.zip
+            mode: '0644'
+
+        - name: Extract gatk source
+          unarchive:
+            src: /opt/gatk-4.6.1.0.zip
+            dest: /opt/
+            remote_src: yes
+            creates: /opt/gatk-4.6.1.0
+
+        - name: Create a symlink from /opt/gatk-4.6.1.0/gatk to /usr/local/bin
+          file:
+            src: /opt/gatk-4.6.1.0/gatk
+            dest: /usr/local/bin/gatk
+            state: link
+    - name: Install picard
+      block:
+        - name: Download picard
+          get_url:
+            url: https://github.com/broadinstitute/picard/releases/download/3.3.0/picard.jar
+            dest: /usr/local/share/picard.jar
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Create a script to run Picard JAR
+          copy:
+            src: picard  # Template file
+            dest: /usr/local/bin/picard
+            mode: '0755'
 
