@@ -86,3 +86,15 @@ resource "local_file" "group_vars_users" {
   )
   filename = "group_vars/all/users.yml"
 }
+
+resource "local_file" "hosts" {
+  content = templatefile("templates/hosts.tpl",
+    {
+      workshop_servers = [for node in openstack_compute_instance_v2.base.*: node ]
+      login: openstack_compute_instance_v2.login
+    }
+  )
+  filename = "files/hosts"
+  file_permission = "0664"
+}
+

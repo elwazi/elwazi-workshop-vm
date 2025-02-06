@@ -81,6 +81,19 @@
         state: latest
         update_cache: yes
 
+- name: Install hosts file
+  tags: [hosts]
+  become: yes
+  become_user: root
+  block:
+    - name: Copy hosts file
+      copy:
+          src: files/hosts
+          dest: /etc/hosts
+          owner: root
+          group: root
+          mode: 0644
+
 - name: Install lmod and dependencies
   tags:
     - lmod
