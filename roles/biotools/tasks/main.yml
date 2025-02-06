@@ -89,6 +89,7 @@
           args:
             chdir: "/tmp/htslib-1.21"
             creates: "/usr/local/bin/tabix"
+    # Rest comes from grbot. Thanks! https://github.com/grbot/ilifu-launch-vm/
     - name: Install gatk
       block:
         - name: Download gatk source
@@ -116,6 +117,7 @@
           get_url:
             url: https://github.com/broadinstitute/picard/releases/download/3.3.0/picard.jar
             dest: /usr/local/share/picard.jar
+            checksum: "sha256:58819a7660646b74b34e282f5d4d21c8dbaea22ddeff96e3258755dafa0f86dc"
             owner: root
             group: root
             mode: '0644'
@@ -125,4 +127,33 @@
             src: picard  # Template file
             dest: /usr/local/bin/picard
             mode: '0755'
+    - name: Install bwa-mem2
+      block:
+        - name: Download bwa-mem2 source
+          get_url:
+            url: https://github.com/bwa-mem2/bwa-mem2/releases/download/v2.2.1/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            checksum: "sha256:b4cfdbce8cc07cdf3f6a920facabc29c976cf77dd53573369508111d6d1c555b"
+            dest: /tmp/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            mode: '0644'
+
+        - name: Extract bwa-mem2 source
+          unarchive:
+            src: /tmp/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            dest: /tmp/
+            remote_src: yes
+            creates: /tmp/bwa-mem2-2.2.1_x64-linux
+
+        - name: Find bwa-mem2 files
+          find:
+            paths: /tmp/bwa-mem2-2.2.1_x64-linux/
+            patterns: 'bwa-mem2*'
+          register: found_files
+
+        - name: Copy files to destination on the managed node
+          copy:
+            src: "{{ item.path }}"
+            dest: /usr/local/bin
+            remote_src: yes
+            mode: '0755'
+          with_items: "{{ found_files.files }}"
 
