@@ -9,24 +9,75 @@
       block:
         - name: Download samtools
           get_url:
-            url: "https://github.com/samtools/samtools/releases/download/1.18/samtools-1.18.tar.bz2"
-            checksum: "sha256:d686ffa621023ba61822a2a50b70e85d0b18e79371de5adb07828519d3fc06e1"
-            dest: "/tmp/samtools-1.18.tar.bz2"
+            url: "https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2"
+            checksum: "sha256:05724b083a6b6f0305fcae5243a056cc36cf826309c3cb9347a6b89ee3fc5ada"
+            dest: "/tmp/samtools-1.21.tar.bz2"
         - name: Uncompress samtools
           unarchive:
-            src: "/tmp/samtools-1.18.tar.bz2"
+            src: "/tmp/samtools-1.21.tar.bz2"
             dest: "/tmp/"
             remote_src: yes
-            creates: "/tmp/samtools-1.18"
+            creates: "/tmp/samtools-1.21"
         - name: Configure samtools
           command: "./configure --prefix=/usr/local"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
         - name: Build samtools
           command: "make"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
         - name: Install samtools
           command: "make install"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
+    - name: Install bcftools
+      block:
+        - name: Download bcftools
+          get_url:
+            url: "https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2"
+            checksum: "sha256:528a4cc1d3555368db75a700b22a3c95da893fd1827f6d304716dfd45ea4e282"
+            dest: "/tmp/bcftools-1.21.tar.bz2"
+        - name: Uncompress bcftools
+          unarchive:
+              src: "/tmp/bcftools-1.21.tar.bz2"
+              dest: "/tmp/"
+              remote_src: yes
+              creates: "/tmp/bcftools-1.21"
+        - name: Configure bcftools
+          command: "./configure --prefix=/usr/local"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+        - name: Build bcftools
+          command: "make"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+        - name: Install bcftools
+          command: "make install"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+    - name: Install htslib
+      block:
+        - name: Download htslib
+          get_url:
+            url: "https://github.com/samtools/htslib/releases/download/1.21/htslib-1.21.tar.bz2"
+            checksum: "sha256:84b510e735f4963641f26fd88c8abdee81ff4cb62168310ae716636aac0f1823"
+            dest: "/tmp/htslib-1.21.tar.bz2"
+        - name: Uncompress htslib
+          unarchive:
+            src: "/tmp/htslib-1.21.tar.bz2"
+            dest: "/tmp/"
+            remote_src: yes
+            creates: "/tmp/htslib-1.21"
+        - name: Configure htslib
+          command: "./configure --prefix=/usr/local"
+          args:
+            chdir: "/tmp/htslib-1.21"
+        - name: Build htslib
+          command: "make"
+          args:
+            chdir: "/tmp/htslib-1.21"
+        - name: Install htslib
+          command: "make install"
+          args:
+            chdir: "/tmp/htslib-1.21"
+
