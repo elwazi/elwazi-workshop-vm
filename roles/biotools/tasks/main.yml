@@ -156,4 +156,48 @@
             remote_src: yes
             mode: '0755'
           with_items: "{{ found_files.files }}"
+    - name: Install shellcheck
+      block:
+        - name: Create directory for Shellcheck
+          file:
+            path: /usr/local/bin
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Download Shellcheck
+          get_url:
+            url: https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            dest: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            mode: '0644'
+
+        - name: Ensure the extraction directory exists
+          file:
+            path: /tmp/extract
+            state: directory
+            mode: '0755'
+
+        - name: Extract the Shellcheck tar
+          unarchive:
+            src: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            dest: /tmp/extract
+            remote_src: yes
+
+        - name: Copy Shellcheck to /usr/local/bin
+          copy:
+            src: /tmp/extract/shellcheck-v0.10.0/shellcheck
+            dest: /usr/local/bin/shellcheck
+            remote_src: yes
+            mode: '0755'
+
+        - name: Clean up files
+          file:
+            path: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            state: absent
+
+        - name: Clean up dirs
+          file:
+            path: /tmp/extract/
+            state: absent
 
