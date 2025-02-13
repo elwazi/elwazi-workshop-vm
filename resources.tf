@@ -80,6 +80,7 @@ resource "local_file" "group_vars_users" {
   content = templatefile("templates/group_vars_users.yaml.tpl",
     {
       passwords = [for password in random_password.password.*: password.result]
+      admin_passwords = [for password in random_password.admin_password.*: password.result]
       admin_users = var.admin_users
 
     }
