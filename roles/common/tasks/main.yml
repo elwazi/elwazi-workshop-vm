@@ -169,9 +169,10 @@
           insertafter: EOF
 
 #- name: Make sure python and java modules are loaded by default
-#  tags: python_and_java
+#  tags: default_modules
 #  become: yes
 #  lineinfile:
 #    path: /etc/profile.d/lmod.sh
-#    line: "module load python java"
+#    regexp: '^module load .*'
+#    line: "module load python java fastqc/0.12.0 trimmomatic/0.39"
 #    insertafter: EOF
