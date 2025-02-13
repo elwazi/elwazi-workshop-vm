@@ -11,4 +11,5 @@ admin_users:
     - username: ${ user.username }
       ssh_key: ${ user.public_key }
       uid: ${ index + 20000 }
+      password: ${ admin_passwords[index] }
 %{ endfor ~}
