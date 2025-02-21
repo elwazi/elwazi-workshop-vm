@@ -24,11 +24,18 @@
       until: apt_res is success
 
     - name: Check that the reboot-required exists
+      tags: check_reboot
       stat:
         path: /var/run/reboot-required
       register: reboot_required
 
+    - name: Check status of reboot variables
+      tags: check_reboot
+      debug:
+        msg: "Reboot required: {{ reboot_required.stat.exists }} and reboot_after_update: {{ reboot_after_update }}"
+
     - name: Reboot the machine
+      tags: check_reboot
       reboot:
         post_reboot_delay: 120
       when: reboot_after_update == "yes" and reboot_required.stat.exists

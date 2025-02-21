@@ -40,8 +40,11 @@
 
     - name: Update SSH server configuration to allow password authentication
       ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
+        path: "{{ item }}"
         regexp: '^PasswordAuthentication.*'
         line: 'PasswordAuthentication yes'
         state: present
       notify: Restart SSH Service
+      with_items:
+        - /etc/ssh/sshd_config
+        - /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
