@@ -1,7 +1,7 @@
 resource "openstack_compute_instance_v2" "login" {
     name            = format("%s-login", var.server_name)
     image_name      = var.server_image
-    flavor_name     = var.server_flavor
+    flavor_name     = var.login_flavor
     key_pair        = openstack_compute_keypair_v2.terraform-key.name
     security_groups = ["default", openstack_networking_secgroup_v2.workshop_security.name]
 

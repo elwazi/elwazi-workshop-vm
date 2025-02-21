@@ -7,6 +7,10 @@ login_servers:
     ansible_connection: ssh
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ControlPersist=15m -i ${ ssh_public_key }'
     ansible_user: ubuntu
+    domain_name: ${ domain_name }
+    jupyter_install: ${ install.jupyter }
+    rstudio_install: ${ install.rstudio }
+
 
 workshop_servers:
   hosts:
@@ -31,3 +35,5 @@ workshop_servers:
     singularity_install: ${ install.singularity }
     nextflow_install: ${ install.nextflow }
     biotools_install: ${ install.biotools }
+    rstudio_install: ${ install.rstudio }
+

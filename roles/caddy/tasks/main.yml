@@ -1,2 +1,58 @@
 ---
 # tasks file for caddy
+
+- name: Install and configure caddy
+  tags: [ caddy ]
+  become: yes
+  become_user: root
+  block:
+    - name: Check if caddy is installed
+      command: caddy version
+      register: caddy_installed
+      ignore_errors: True
+
+    - name: Install caddy prerequisites
+      when: caddy_installed.rc != 0
+      apt:
+          name:
+            - apt-transport-https
+            - ca-certificates
+            - curl
+            - debian-archive-keyring
+            - debian-keyring
+            - gnupg
+            - lsb-release
+          state: present
+
+    - name: Add caddy gpg repository key
+      when: caddy_installed.rc != 0
+      apt_key:
+          url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+          state: present
+          keyring: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+    - name: Add caddy repositories
+      when: caddy_installed.rc != 0
+      apt_repository:
+          repo: "{{ item }}"
+          state: present
+      with_items:
+        - "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+        - "deb-src [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+
+    - name: Install caddy
+      when: caddy_installed.rc != 0
+      apt:
+          name: caddy
+          state: latest
+          update_cache: yes
+
+    - name: Configure caddy
+      template:
+          src: Caddyfile.j2
+          dest: /etc/caddy/Caddyfile
+          owner: root
+          group: root
+          mode: 0644
+      notify: Restart caddy
+

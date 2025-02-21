@@ -7,6 +7,7 @@ resource "local_file" "ansible_inventory" {
       ssh_public_key = var.ssh_key_public
       admin_users = var.admin_users
       users_per_server = var.users_per_server
+      domain_name = var.login_domain_name
       install = {
         biotools = var.install_biotools,
         cromwell = var.install_cromwell,
@@ -14,6 +15,7 @@ resource "local_file" "ansible_inventory" {
         jupyter = var.install_jupyter,
         nextflow = var.install_nextflow,
         singularity = var.install_singularity,
+        rstudio = var.install_rstudio,
       }
     }
   )

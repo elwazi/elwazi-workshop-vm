@@ -19,7 +19,7 @@ data "openstack_networking_network_v2" "public" {
 resource "openstack_networking_subnet_v2" "workshop_subnet" {
     name = "${var.server_name}-subnet"
     network_id = openstack_networking_network_v2.workshop_network.id
-    cidr = "192.168.40.0/24"
+    cidr = "${var.cidr}"
     ip_version = 4
     enable_dhcp = "true"
     dns_nameservers = ["8.8.8.8"]
