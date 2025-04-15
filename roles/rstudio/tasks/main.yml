@@ -1,0 +1,58 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for rstudio
+
+- name: Install R and RStudio
+  tags: [ R, rstudio ]
+  become: yes
+  become_user: root
+  when: rstudio_install is defined and rstudio_install
+  block:
+    - name: Install R and rstudio prerequisites
+      apt:
+          name:
+            - dirmngr
+            - gdebi-core
+            - software-properties-common
+          state: present
+    - name: Add R repository key
+      apt_key:
+          url: https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc
+          state: present
+    - name: Add R repository
+      apt_repository:
+          repo: deb https://cloud.r-project.org/bin/linux/ubuntu {{ ansible_distribution_release }}-cran40/
+          state: present
+    - name: Install R
+      apt:
+          name: r-base
+          state: latest
+          update_cache: yes
+    - name: Check if RStudio service exists
+      command: systemctl is-active rstudio-server
+      register: rstudio_service
+      ignore_errors: True
+    - name: Stop RStudio service if it exists
+      when: rstudio_service.rc == 0
+      service:
+          name: rstudio-server
+          state: stopped
+    - name: Check if RStudio installed
+      command: rstudio-server verify-installation
+      register: rstudio_installed
+      ignore_errors: True
+    - name: Download RStudio
+      when: rstudio_installed.rc != 0 or rstudio_installed.stdout.find("Version") == -1
+      get_url:
+          url: "https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2024.12.1-563-amd64.deb"
+          dest: /tmp/rstudio-server-2024.12.1-563-amd64.deb
+          checksum: "sha256:aebdb72344a0600e8952bc47b669ee2c952e4ccb64e253cfc472f1d0c5265f3a"
+    - name: Install RStudio
+      when: rstudio_installed.rc != 0 or rstudio_installed.stdout.find("Version") == -1
+      command: gdebi -n /tmp/rstudio-server-2024.12.1-563-amd64.deb
+      register: rstudio_install
+    - name: Remove downloaded RStudio package
+      when: rstudio_install.rc == 0
+      file:
+        path: /tmp/rstudio-server-2024.12.1-563-amd64.deb
+        state: absent

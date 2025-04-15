@@ -10,7 +10,7 @@ resource "openstack_sharedfilesystem_share_v2" "home_share" {
 resource "openstack_sharedfilesystem_share_access_v2" "home_share_access_rw" {
   share_id     = openstack_sharedfilesystem_share_v2.home_share.id
   access_type  = "cephx"
-  access_to    = "workshop_users_rw"
+  access_to    = "${var.server_name}-workshop-home-rw"
   access_level = "rw"
 }
 
@@ -26,7 +26,7 @@ resource "openstack_sharedfilesystem_share_v2" "software_share" {
 resource "openstack_sharedfilesystem_share_access_v2" "software_share_access_rw" {
   share_id     = openstack_sharedfilesystem_share_v2.software_share.id
   access_type  = "cephx"
-  access_to    = "workshop_users_rw"
+  access_to    = "${var.server_name}-workshop-software-rw"
   access_level = "rw"
 }
 
@@ -42,7 +42,7 @@ resource "openstack_sharedfilesystem_share_v2" "scratch_share" {
 resource "openstack_sharedfilesystem_share_access_v2" "scratch_share_access_rw" {
   share_id     = openstack_sharedfilesystem_share_v2.scratch_share.id
   access_type  = "cephx"
-  access_to    = "workshop_users_rw"
+  access_to    = "${var.server_name}-workshop-scratch-rw"
   access_level = "rw"
 }
 
@@ -58,6 +58,6 @@ resource "openstack_sharedfilesystem_share_v2" "data_share" {
 resource "openstack_sharedfilesystem_share_access_v2" "data_share_access_rw" {
   share_id     = openstack_sharedfilesystem_share_v2.data_share.id
   access_type  = "cephx"
-  access_to    = "workshop_users_rw"
+  access_to    = "${var.server_name}-workshop-data-rw"
   access_level = "rw"
 }

@@ -1,18 +1,23 @@
 ---
 # file: site.yaml
-
 - hosts: all
   roles:
     - base
     - common
-    - docker
     - storage
     - admin_users
     - workshop-user
 
+- hosts: login_servers
+  roles:
+    - caddy
+
+- hosts: workshop_servers
+  roles:
+    - docker
     - singularity
-    - nginx
     - jupyter
     - biotools
     - cromwell
     - nextflow
+    - rstudio

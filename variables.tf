@@ -17,6 +17,10 @@ variable "server_name" {
   type = string
   default = "elwazi-workshop"
 }
+variable "cidr" {
+  type    = string
+  default = "192.168.40.0/24"
+}
 variable "server_count" {
   type = number
   default = 2
@@ -28,6 +32,13 @@ variable "users_per_server" {
 variable "server_flavor" {
   type = string
   default = "ilifu-A"
+}
+variable "login_flavor" {
+  type = string
+  default = "ilifu-A"
+}
+variable "login_domain_name" {
+  type = string
 }
 variable "server_image" {
   type = string
@@ -64,6 +75,11 @@ variable "install_jupyter" {
 }
 
 variable "install_nextflow" {
+  type = bool
+  default = true
+}
+
+variable "install_rstudio" {
   type = bool
   default = true
 }

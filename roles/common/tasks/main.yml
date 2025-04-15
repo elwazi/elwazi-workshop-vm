@@ -22,11 +22,18 @@
           - 'git'
           - 'gnutls-bin'
           - 'libbz2-dev'
+          - 'libffi-dev'
+          - 'libc6-dev'
+          - 'libcurl4-openssl-dev'
           - 'libfuse3-dev'
+          - 'libgdbm-dev'
           - 'libglib2.0-dev'
           - 'liblzma-dev'
           - 'libncurses-dev'
+          - 'libreadline-dev'
           - 'libseccomp-dev'
+          - 'libsqlite3-dev'
+          - 'libssl-dev'
           - 'libtool-bin'
           - 'python-is-python3'
           - 'python3-pip'
@@ -80,3 +87,92 @@
           - google-cloud-cli
         state: latest
         update_cache: yes
+
+- name: Install hosts file
+  tags: [hosts]
+  become: yes
+  become_user: root
+  block:
+    - name: Copy hosts file
+      copy:
+          src: files/hosts
+          dest: /etc/hosts
+          owner: root
+          group: root
+          mode: 0644
+
+- name: Install lmod and dependencies
+  tags:
+    - lmod
+  block:
+    - name: Install lmod dependencies
+      become: yes
+      apt:
+        name:
+          - lua5.3
+          - lua-bit32:amd64
+          - lua-posix:amd64
+          - lua-posix-dev
+          - liblua5.3-0:amd64
+          - liblua5.3-dev:amd64
+          - tcl
+          - tcl-dev
+          - tcl8.6
+          - tcl8.6-dev:amd64
+          - libtcl8.6:amd64
+    - name: ensure src directory exists
+      become: no
+      file:
+        path: ~/src
+        state: directory
+
+    - name: Fetch lmod source
+      become: no
+      get_url:
+        url: "https://github.com/TACC/Lmod/archive/refs/tags/8.7.56.tar.gz"
+        dest: ~/src/lmod.tar.gz
+        checksum: "sha256:b7ee903b79ccd5bf195921f09bfc13879ad09d2b4598f4a0c2346bad9faaf28c"
+    - name: Extract lmod source
+      become: no
+      unarchive:
+        src: ~/src/lmod.tar.gz
+        dest: ~/src
+        creates: ~/src/Lmod-8.7.56
+        remote_src: yes
+    - name: Configure lmod
+      become: no
+      command: ./configure --prefix=/opt/lmod/8.7
+      args:
+        chdir: ~/src/Lmod-8.7.56
+#        creates: ~/src/Lmod-8.7/makefile
+    - name: Build lmod
+      become: no
+      command: make
+      args:
+        chdir: ~/src/Lmod-8.7.56
+    - name: Install lmod
+      become: yes
+      command: make install
+      args:
+        chdir: "~{{ ansible_user }}/src/Lmod-8.7.56"
+    - name: Link profile.d lmod.sh
+      become: yes
+      file:
+        src: /opt/lmod/8.7/lmod/lmod/init/profile
+        dest: /etc/profile.d/lmod.sh
+        state: link
+    - name: Add software/modules to MODULEPATH
+      become: yes
+      lineinfile:
+          path: /etc/profile.d/lmod.sh
+          line: "export MODULEPATH=/software/modules:$MODULEPATH"
+          insertafter: EOF
+
+#- name: Make sure python and java modules are loaded by default
+#  tags: default_modules
+#  become: yes
+#  lineinfile:
+#    path: /etc/profile.d/lmod.sh
+#    regexp: '^module load .*'
+#    line: "module load python java fastqc/0.12.0 trimmomatic/0.39"
+#    insertafter: EOF

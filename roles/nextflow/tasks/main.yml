@@ -5,9 +5,15 @@
   become: yes
   become_user: root
   block:
+#    - name: Download nextflow
+#      get_url:
+#        url: "https://github.com/nextflow-io/nextflow/releases/download/v23.04.4/nextflow-23.04.4-all"
+#        checksum: "sha512:90712d34ddedc9fae5fe75bc78bb333b6b3da864a089489df380ee313fbf312dd28d3094bc2ac67472f9fafb854d2bba2ff8f8dbafc01b6ef176ad8ea469b4f3"
+#        dest: "/usr/local/bin/nextflow"
+#        mode: u=rwx,g=rx,o=rx
     - name: Download nextflow
       get_url:
-        url: "https://github.com/nextflow-io/nextflow/releases/download/v23.04.4/nextflow-23.04.4-all"
-        checksum: "sha512:90712d34ddedc9fae5fe75bc78bb333b6b3da864a089489df380ee313fbf312dd28d3094bc2ac67472f9fafb854d2bba2ff8f8dbafc01b6ef176ad8ea469b4f3"
+        url: "https://github.com/nextflow-io/nextflow/releases/download/v24.10.4/nextflow-24.10.4-dist"
+        checksum: "sha512:a9531de5cc853eb104d0662afd9be64422ceb2ad867fecdc278d45d200238f364b2600955c87caf5e7f0697475eecfe43b778efae93080538b1acecae9d04990"
         dest: "/usr/local/bin/nextflow"
         mode: u=rwx,g=rx,o=rx

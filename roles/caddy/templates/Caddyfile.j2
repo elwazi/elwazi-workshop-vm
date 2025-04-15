@@ -1,0 +1,20 @@
+{{ domain_name }} {
+    log {
+        output file /var/log/caddy/access.log
+    }
+{% if jupyter_install %}
+    {% for server in groups["workshop_servers"] %}
+    handle /{{ hostvars[server].inventory_hostname_short }}/jupyter/* {
+        reverse_proxy {{ hostvars[server].inventory_hostname_short }}:8000
+    }
+{% endfor %}
+{% endif %}
+{% if rstudio_install %}
+    {% for server in groups["workshop_servers"] %}
+    handle_path /{{ hostvars[server].inventory_hostname_short }}/rstudio/* {
+        reverse_proxy {{ hostvars[server].inventory_hostname_short }}:8787
+    }
+{% endfor %}
+{% endif %}
+}
+

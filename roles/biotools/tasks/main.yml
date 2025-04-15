@@ -9,24 +9,195 @@
       block:
         - name: Download samtools
           get_url:
-            url: "https://github.com/samtools/samtools/releases/download/1.18/samtools-1.18.tar.bz2"
-            checksum: "sha256:d686ffa621023ba61822a2a50b70e85d0b18e79371de5adb07828519d3fc06e1"
-            dest: "/tmp/samtools-1.18.tar.bz2"
+            url: "https://github.com/samtools/samtools/releases/download/1.21/samtools-1.21.tar.bz2"
+            checksum: "sha256:05724b083a6b6f0305fcae5243a056cc36cf826309c3cb9347a6b89ee3fc5ada"
+            dest: "/tmp/samtools-1.21.tar.bz2"
         - name: Uncompress samtools
           unarchive:
-            src: "/tmp/samtools-1.18.tar.bz2"
+            src: "/tmp/samtools-1.21.tar.bz2"
             dest: "/tmp/"
             remote_src: yes
-            creates: "/tmp/samtools-1.18"
+            creates: "/tmp/samtools-1.21"
         - name: Configure samtools
           command: "./configure --prefix=/usr/local"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
+              creates: "/tmp/samtools-1.21/Makefile"
         - name: Build samtools
           command: "make"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
+              creates: "/tmp/samtools-1.21/samtools"
         - name: Install samtools
           command: "make install"
           args:
-              chdir: "/tmp/samtools-1.18"
+              chdir: "/tmp/samtools-1.21"
+              creates: "/usr/local/bin/samtools"
+    - name: Install bcftools
+      block:
+        - name: Download bcftools
+          get_url:
+            url: "https://github.com/samtools/bcftools/releases/download/1.21/bcftools-1.21.tar.bz2"
+            checksum: "sha256:528a4cc1d3555368db75a700b22a3c95da893fd1827f6d304716dfd45ea4e282"
+            dest: "/tmp/bcftools-1.21.tar.bz2"
+        - name: Uncompress bcftools
+          unarchive:
+              src: "/tmp/bcftools-1.21.tar.bz2"
+              dest: "/tmp/"
+              remote_src: yes
+              creates: "/tmp/bcftools-1.21"
+        - name: Configure bcftools
+          command: "./configure --prefix=/usr/local"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+              creates: "/tmp/bcftools-1.21/Makefile"
+        - name: Build bcftools
+          command: "make"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+              creates: "/tmp/bcftools-1.21/bcftools"
+        - name: Install bcftools
+          command: "make install"
+          args:
+              chdir: "/tmp/bcftools-1.21"
+              creates: "/usr/local/bin/bcftools"
+    - name: Install htslib
+      block:
+        - name: Download htslib
+          get_url:
+            url: "https://github.com/samtools/htslib/releases/download/1.21/htslib-1.21.tar.bz2"
+            checksum: "sha256:84b510e735f4963641f26fd88c8abdee81ff4cb62168310ae716636aac0f1823"
+            dest: "/tmp/htslib-1.21.tar.bz2"
+        - name: Uncompress htslib
+          unarchive:
+            src: "/tmp/htslib-1.21.tar.bz2"
+            dest: "/tmp/"
+            remote_src: yes
+            creates: "/tmp/htslib-1.21"
+        - name: Configure htslib
+          command: "./configure --prefix=/usr/local"
+          args:
+            chdir: "/tmp/htslib-1.21"
+            creates: "/tmp/htslib-1.21/Makefile"
+        - name: Build htslib
+          command: "make"
+          args:
+            chdir: "/tmp/htslib-1.21"
+            creates: "/tmp/htslib-1.21/tabix"
+        - name: Install htslib
+          command: "make install"
+          args:
+            chdir: "/tmp/htslib-1.21"
+            creates: "/usr/local/bin/tabix"
+    # Rest comes from grbot. Thanks! https://github.com/grbot/ilifu-launch-vm/
+    - name: Install gatk
+      block:
+        - name: Download gatk source
+          get_url:
+            url: https://github.com/broadinstitute/gatk/releases/download/4.6.1.0/gatk-4.6.1.0.zip
+            checksum: "sha256:ac7015c3f0ef1852745ca0ef647adbf8ddef5db63ab485b00bc1ffe654814155"
+            dest: /opt/gatk-4.6.1.0.zip
+            mode: '0644'
+
+        - name: Extract gatk source
+          unarchive:
+            src: /opt/gatk-4.6.1.0.zip
+            dest: /opt/
+            remote_src: yes
+            creates: /opt/gatk-4.6.1.0
+
+        - name: Create a symlink from /opt/gatk-4.6.1.0/gatk to /usr/local/bin
+          file:
+            src: /opt/gatk-4.6.1.0/gatk
+            dest: /usr/local/bin/gatk
+            state: link
+    - name: Install picard
+      block:
+        - name: Download picard
+          get_url:
+            url: https://github.com/broadinstitute/picard/releases/download/3.3.0/picard.jar
+            dest: /usr/local/share/picard.jar
+            checksum: "sha256:58819a7660646b74b34e282f5d4d21c8dbaea22ddeff96e3258755dafa0f86dc"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Create a script to run Picard JAR
+          copy:
+            src: picard  # Template file
+            dest: /usr/local/bin/picard
+            mode: '0755'
+    - name: Install bwa-mem2
+      block:
+        - name: Download bwa-mem2 source
+          get_url:
+            url: https://github.com/bwa-mem2/bwa-mem2/releases/download/v2.2.1/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            checksum: "sha256:b4cfdbce8cc07cdf3f6a920facabc29c976cf77dd53573369508111d6d1c555b"
+            dest: /tmp/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            mode: '0644'
+
+        - name: Extract bwa-mem2 source
+          unarchive:
+            src: /tmp/bwa-mem2-2.2.1_x64-linux.tar.bz2
+            dest: /tmp/
+            remote_src: yes
+            creates: /tmp/bwa-mem2-2.2.1_x64-linux
+
+        - name: Find bwa-mem2 files
+          find:
+            paths: /tmp/bwa-mem2-2.2.1_x64-linux/
+            patterns: 'bwa-mem2*'
+          register: found_files
+
+        - name: Copy files to destination on the managed node
+          copy:
+            src: "{{ item.path }}"
+            dest: /usr/local/bin
+            remote_src: yes
+            mode: '0755'
+          with_items: "{{ found_files.files }}"
+    - name: Install shellcheck
+      block:
+        - name: Create directory for Shellcheck
+          file:
+            path: /usr/local/bin
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Download Shellcheck
+          get_url:
+            url: https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            dest: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            mode: '0644'
+
+        - name: Ensure the extraction directory exists
+          file:
+            path: /tmp/extract
+            state: directory
+            mode: '0755'
+
+        - name: Extract the Shellcheck tar
+          unarchive:
+            src: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            dest: /tmp/extract
+            remote_src: yes
+
+        - name: Copy Shellcheck to /usr/local/bin
+          copy:
+            src: /tmp/extract/shellcheck-v0.10.0/shellcheck
+            dest: /usr/local/bin/shellcheck
+            remote_src: yes
+            mode: '0755'
+
+        - name: Clean up files
+          file:
+            path: /tmp/shellcheck-v0.10.0.linux.x86_64.tar.xz
+            state: absent
+
+        - name: Clean up dirs
+          file:
+            path: /tmp/extract/
+            state: absent
+

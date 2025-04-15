@@ -29,6 +29,7 @@
         generate_ssh_key: no
         shell: /bin/bash
         uid: "{{ item.uid }}"
+        password: "{{ item.password | password_hash('sha512') }}"
       with_items:
         - "{{ admin_users }}"
       retries: 5
