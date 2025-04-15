@@ -1319,6 +1319,7 @@ c.Spawner.notebook_dir = '~'
 #  Default: set()
 # c.Authenticator.admin_users = set()
 c.Authenticator.admin_users = { {% for user in admin_users %}'{{ user.username }}'{% if not loop.last %}, {% endif %} {% endfor %} }
+c.Authenticator.allow_all = True
 
 ## Set of usernames that are allowed to log in.
 #
