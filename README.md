@@ -53,28 +53,42 @@ Create a file called `terraform.tfvars` for example:
 
 ```hcl terraform.tfvars
 ssh_key_public = "~/.ssh/id_rsa.pub"
+login_domain_name = "mamana-workshop.ilifu.ac.za"
 
-server_name = "elwazi-something"
+cidr = "192.168.70.0/24"
 
-server_count = 16
-users_per_server = 2
-server_flavor = "ilifu-C-30"
+server_name = "mamana-workshop"
 
-server_image = "20230914-jammy"
+server_count = 1
+users_per_server = 30
+server_flavor = "ilifu-G-240G"
+
+server_image = "20250320-noble"
 
 admin_users = [
   {
-    username = "admin1"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQ…"
-  },
-  {
-    username = "admin2"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQ…"
-  },
-  
+    username = "dane"
+    public_key = "ssh-ed25519 AAAAwaddawaddawadda"
+  }
+
 ]
+
+install_biotools = true
+install_cromwell = false
+install_docker = false
+install_jupyter = true
+install_nextflow = false
+install_rstudio = false
+install_singularity = false
+
+home_share_size_gb = 20
+scratch_share_size_gb = 80
+software_share_size_gb = 20
+data_share_size_gb = 40
 ```
-If you installed the openstack client you can find available images using:
+If you look at the `variables.tf` file you can see the available variables, their default values and a description of what they're for. At a minimum you will need to configure the variables that have no default values.
+
+If you installed the openstack client you can find available images (for the `server_image` variable) using:
 ```bash
 $ openstack image list
 ```
@@ -88,6 +102,8 @@ $ terraform apply
 ```
 This will create an inventory file `inventory.yaml` that will be used by ansible to setup the nodes.
 There will also be a tab-separated file called `users.tsv` which has login details for each of the users.
+
+Check the inventory for the IP address of the `login_node`. You will need to set the DNS to point at this IP address.
 
 ## Run `ansible-playbook` to setup the nodes
 ```bash
