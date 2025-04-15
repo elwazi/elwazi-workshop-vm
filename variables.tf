@@ -42,7 +42,7 @@ variable "login_domain_name" {
 }
 variable "server_image" {
   type = string
-  default = "20230914-jammy"
+  default = "20250320-noble"
 }
 variable "admin_users" {
   type = list(map(string))
