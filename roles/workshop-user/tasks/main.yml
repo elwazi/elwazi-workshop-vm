@@ -16,8 +16,6 @@
         - "{{ workshop_users }}"
       loop_control:
         label: "{{ item.username }}"
-      register: create_users_loop
-
 
     - name: Ensure homes are secure by default
       file:
