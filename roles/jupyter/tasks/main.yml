@@ -5,6 +5,15 @@
   become: yes
   become_user: root
   block:
+    - name: Ensure pam_lastlog is disabled
+      tags: [pam]
+      pamd:
+        name: login
+        type: session
+        module_path: pam_lastlog.so
+        control: optional
+        state: absent
+
     - name: Check nodejs version
       tags: [ nodejs,build ]
       command: "node -v"
@@ -76,39 +85,55 @@
           group: "{{ jupyterhub_group }}"
           mode: "u=rwx,g=rx,o=rx"
 
-
-    - name: Ensure pipenv is installed for user {{ jupyterhub_user }}
-      tags: [ pipenv ]
+    - name: Download uv install script
+      tags: [build, uv]
       become: yes
       become_user: "{{ jupyterhub_user }}"
-      pip:
-        name: pipenv
-        executable: pip3
-        extra_args: "--user"
+      get_url:
+        url: "https://astral.sh/uv/install.sh"
+        dest: "/tmp/uv_install.sh"
+        mode: "u=rx"
+
+    - name: Run uv installation script at /tmp/uv_install.sh
+      tags: [build, uv]
+      become: yes
+      become_user: "{{ jupyterhub_user }}"
+      command: "/tmp/uv_install.sh"
+
+
+
+#    - name: Ensure pipenv is installed for user {{ jupyterhub_user }}
+#      tags: [ pipenv ]
+#      become: yes
+#      become_user: "{{ jupyterhub_user }}"
+#      pip:
+#        name: pipenv
+#        executable: pip3
+#        extra_args: "--user"
 
     - name: Setup jupyterhub/notebook virtualenv
-      tags: [pipenv,build]
+      tags: [uv,build]
       become: yes
       become_user: "{{ jupyterhub_user }}"
       block:
-        - name: Copy pipenv files to {{ jupyterhub_dir }}
+        - name: Copy requirements.txt files to {{ jupyterhub_dir }}
           copy:
-            src: "{{ item }}"
-            dest: "{{ jupyterhub_dir }}/"
+            src: "jupyterhub.requirements.txt"
+            dest: "{{ jupyterhub_dir }}/requirements.txt"
             mode: "u=rw,g=r,o=r"
-          with_items:
-            - Pipfile
-            - Pipfile.lock
           register: pipenv_change
-        - name: "Setup {{ jupyterhub_user }}'s python environment using pipenv"
-          command: "~/.local/bin/pipenv sync"
+        - name: "Create virtual environment using uv"
+          command: "~/.local/bin/uv venv"
           args:
             chdir: "{{ jupyterhub_dir }}"
           environment:
-            PIPENV_VENV_IN_PROJECT: 1
             PATH: "{{ python_dir }}/bin:{{ ansible_env.PATH }}"
-            SLURM_INCLUDE_DIR: "{{ slurm_root }}/include"
-            SLURM_LIB_DIR: "{{ slurm_root }}/lib"
+        - name: "Setup {{ jupyterhub_user }}'s python environment using uv"
+          command: "~/.local/bin/uv pip sync requirements.txt"
+          args:
+            chdir: "{{ jupyterhub_dir }}"
+          environment:
+            PATH: "{{ python_dir }}/bin:{{ ansible_env.PATH }}"
           notify: Enable and start jupyterhub service
         - name: Setup jupyterhub/notebook config files
           tags: [config]
@@ -137,10 +162,17 @@
           community.general.sudoers:
             name: jupyterhub
             user: "{{ jupyterhub_user }}"
-            runas: "ALL"
+            runas: "%jupyter_user"
             nopassword: yes
             setenv: true
             commands:
               - "{{ jupyterhub_dir }}/.venv/bin/sudospawner"
+        - name: Add {{ jupyterhub_user }} to shadow group
+          become: yes
+          become_user: root
+          user:
+            name: "{{ jupyterhub_user }}"
+            groups: shadow
+            append: yes
 
-          tags: [ sudoers ]
+          tags: [ shadow ]
