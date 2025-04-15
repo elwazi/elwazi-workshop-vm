@@ -37,6 +37,25 @@
       loop_control:
         label: "{{ item.username }}"
 
+    - name: 'Create jupyter_user group'
+      when: jupyter_install is defined and jupyter_install
+      group:
+        name: jupyter_user
+        state: present
+
+
+    - name: Add user to 'jupyter_user' group
+      when: jupyter_install is defined and jupyter_install
+      user:
+        name: "{{ item.username }}"
+        groups: jupyter_user
+        append: yes
+      with_items:
+        - "{{ workshop_users }}"
+      loop_control:
+        label: "{{ item.username }}"
+
+
 
     - name: Update SSH server configuration to allow password authentication
       ansible.builtin.lineinfile:

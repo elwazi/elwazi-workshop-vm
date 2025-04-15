@@ -94,3 +94,21 @@
         - "{{ admin_users }}"
       loop_control:
         label: "{{ item.username }}"
+
+    - name: 'Create jupyter_user group'
+      when: jupyter_install is defined and jupyter_install
+      group:
+        name: jupyter_user
+        state: present
+
+
+    - name: Add user to 'jupyter_user' group
+      when: jupyter_install is defined and jupyter_install
+      user:
+        name: "{{ item.username }}"
+        groups: jupyter_user
+        append: yes
+      with_items:
+        - "{{ admin_users }}"
+      loop_control:
+        label: "{{ item.username }}"

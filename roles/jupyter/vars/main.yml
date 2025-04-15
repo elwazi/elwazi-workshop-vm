@@ -9,7 +9,7 @@ slurm_root: "/opt/slurm"
 jupyter_keycloak_client: "jupyter"
 
 # vars file for jupyter
-nodejs_version: 19
+nodejs_version: 22
 configurable_http_proxy_version: 4.5.4
 
 # should have /bin/pipenv
