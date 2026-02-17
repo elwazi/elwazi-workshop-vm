@@ -56,3 +56,19 @@
           mode: 0644
       notify: Restart caddy
 
+    - name: Ensure /var/www/html directory exists
+      file:
+        path: /var/www/html
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: 0755
+
+    - name: Create welcome page
+      template:
+          src: index.html.j2
+          dest: /var/www/html/index.html
+          owner: www-data
+          group: www-data
+          mode: 0644
+

@@ -11,6 +11,8 @@ resource "openstack_compute_instance_v2" "login" {
     network {
       name = data.openstack_networking_network_v2.ceph_net.name
     }
+
+    depends_on = [openstack_compute_instance_v2.base]
 }
 
 resource "openstack_compute_instance_v2" "base" {

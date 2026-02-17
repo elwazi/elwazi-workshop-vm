@@ -2,6 +2,10 @@
     log {
         output file /var/log/caddy/access.log
     }
+    handle / {
+        root * /var/www/html
+        file_server
+    }
 {% if jupyter_install %}
     {% for server in groups["workshop_servers"] %}
     handle /{{ hostvars[server].inventory_hostname_short }}/jupyter/* {

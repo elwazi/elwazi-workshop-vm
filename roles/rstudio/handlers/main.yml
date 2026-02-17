@@ -1,3 +1,8 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # handlers file for rstudio
+
+- name: Restart rstudio
+  service:
+    name: rstudio-server
+    state: restarted
