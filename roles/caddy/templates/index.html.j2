@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ilifu Training Resource</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .logo { text-align: center; margin-bottom: 1rem; }
+        .logo svg { width: 160px; height: auto; }
+        code.copyable {
+            cursor: pointer;
+            position: relative;
+            display: block;
+        }
+        code.copyable:hover::after {
+            content: "click to copy";
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+        code.copyable.copied::after {
+            content: "copied!";
+            color: #4ec94e;
+            opacity: 1;
+        }
+        #details { display: none; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="logo">
+            <svg width="360" height="200" viewBox="0 0 95.25 52.916666" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ilifu logo">
+                <g>
+                    <path style="fill:#059bda;fill-opacity:1" d="m 9.702848,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
+                    <path style="fill:#023760" d="m 9.702848,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
+                    <path style="fill:#023760" d="m 21.894836,44.898732 h 6.7564 V 7.357533 h -6.7564 z" />
+                    <path style="fill:#059bda;fill-opacity:1" d="m 34.086824,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
+                    <path style="fill:#023760" d="m 34.086824,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
+                    <path style="fill:#023760" d="m 46.482014,44.898732 h 6.7564 V 22.902333 h 3.81 v -5.6388 h -3.81 c 0.0508,-2.5908 0.9144,-3.4036 3.6068,-3.4036 h 0.6096 v -6.4008 c -0.8128,-0.1016 -1.1684,-0.1016 -1.6764,-0.1016 -2.9464,0 -5.334,1.0668 -7.0612,3.1496 -1.3716,1.6256 -1.8796,3.2512 -2.2352,6.7564 h -2.4384 v 5.6388 h 2.4384 z" />
+                    <path style="fill:#023760" d="m 85.547151,16.755533 h -6.756399 v 13.258799 c 0,3.7592 -0.254,5.5372 -1.0668,6.7564 -0.9652,1.6764 -2.8448,2.5908 -5.1308,2.5908 -1.7272,0 -3.048,-0.5588 -3.9624,-1.778 -0.9652,-1.2192 -1.3716,-3.2512 -1.3716,-7.0612 V 16.755533 h -6.7564 v 15.087599 c 0,4.7752 0.5588,7.2644 2.1336,9.5504 1.8796,2.6924 4.8768,4.1656 8.5852,4.1656 3.4036,0 5.4864,-0.8636 8.0772,-3.3528 v 2.6924 h 6.248399 z" />
+                </g>
+            </svg>
+            <h1>Welcome to this ilifu training resource</h1>
+        </header>
+
+        <article aria-label="Password notice">
+            <strong>Need your password?</strong>
+            Ask your course or workshop instructor for your login credentials.
+        </article>
+
+{% if jupyter_install or rstudio_install %}
+        <section>
+            <h2>Available Services</h2>
+            <ul>
+{% if jupyter_install %}
+                <li>JupyterLab</li>
+{% endif %}
+{% if rstudio_install %}
+                <li>RStudio</li>
+{% endif %}
+            </ul>
+        </section>
+{% endif %}
+
+        <section>
+            <label for="user-select"><strong>Select your username</strong></label>
+            <select id="user-select">
+                <option value="">-- choose --</option>
+{% for server in groups["workshop_servers"] %}
+{% for user in hostvars[server].workshop_users %}
+                <option value="{{ user.username }}">{{ user.username }}</option>
+{% endfor %}
+{% endfor %}
+            </select>
+
+            <div id="details">
+                <div>
+                    <small>SSH command (via ProxyJump through {{ domain_name }})</small>
+                    <code id="ssh-cmd" class="copyable"></code>
+                </div>
+{% if jupyter_install %}
+                <div>
+                    <small>JupyterLab</small>
+                    <code id="jupyter-url" class="copyable"></code>
+                </div>
+{% endif %}
+{% if rstudio_install %}
+                <div>
+                    <small>RStudio</small>
+                    <code id="rstudio-url" class="copyable"></code>
+                </div>
+{% endif %}
+            </div>
+        </section>
+
+        <hr>
+
+        <details>
+            <summary>SSH Tips</summary>
+            <h3>Persistent sessions with tmux</h3>
+            <p>Use <kbd>tmux</kbd> to keep your terminal sessions running even if you disconnect.</p>
+            <ul>
+                <li>Start a new session: <code>tmux new -s work</code></li>
+                <li>Detach from session: <kbd>Ctrl+b</kbd> then <kbd>d</kbd></li>
+                <li>Reattach to session: <code>tmux attach -t work</code></li>
+            </ul>
+
+            <h3>SSH key authentication</h3>
+            <p>Copy your SSH key to the server to avoid typing your password each time:</p>
+            <code>ssh-copy-id -J <em>username</em>@{{ domain_name }} <em>username</em>@<em>server</em></code>
+        </details>
+
+        <details>
+            <summary>Storage Layout</summary>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/users</code></td>
+                        <td>Your home directory &mdash; persistent across sessions</td>
+                    </tr>
+                    <tr>
+                        <td><code>/data</code></td>
+                        <td>Shared course/workshop datasets &mdash; typically read-only</td>
+                    </tr>
+                    <tr>
+                        <td><code>/scratch</code></td>
+                        <td>Temporary working space &mdash; may be cleaned periodically</td>
+                    </tr>
+                    <tr>
+                        <td><code>/software</code></td>
+                        <td>Shared software and tools</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+    </main>
+
+    <script>
+        var userData = {
+{% for server in groups["workshop_servers"] %}
+{% for user in hostvars[server].workshop_users %}
+            "{{ user.username }}": "{{ hostvars[server].inventory_hostname_short }}",
+{% endfor %}
+{% endfor %}
+        };
+
+        var domain = "{{ domain_name }}";
+
+        document.getElementById("user-select").addEventListener("change", function () {
+            var username = this.value;
+            var details = document.getElementById("details");
+            if (!username) {
+                details.style.display = "none";
+                return;
+            }
+            var server = userData[username];
+            details.style.display = "block";
+
+            document.getElementById("ssh-cmd").textContent =
+                "ssh -J " + username + "@" + domain + " " + username + "@" + server;
+{% if jupyter_install %}
+            document.getElementById("jupyter-url").innerHTML =
+                '<a href="https://' + domain + '/' + server + '/jupyter/" target="_blank">https://' + domain + '/' + server + '/jupyter/</a>';
+{% endif %}
+{% if rstudio_install %}
+            document.getElementById("rstudio-url").innerHTML =
+                '<a href="https://' + domain + '/' + server + '/rstudio/" target="_blank">https://' + domain + '/' + server + '/rstudio/</a>';
+{% endif %}
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target.tagName === "A") return;
+            var el = e.target.closest("code.copyable");
+            if (!el) return;
+            var text = el.textContent;
+            if (!navigator.clipboard) return;
+            navigator.clipboard.writeText(text).then(function () {
+                el.classList.add("copied");
+                setTimeout(function () { el.classList.remove("copied"); }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
