@@ -1,0 +1,9 @@
+[project]
+name = "jupyter-workshop-vms-hocine"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "ansible>=13.3.0",
+    "passlib>=1.7.4",
+    "python-openstackclient>=8.3.0",
+]
