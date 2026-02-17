@@ -44,15 +44,23 @@
     - name: Download RStudio
       when: rstudio_installed.rc != 0 or rstudio_installed.stdout.find("Version") == -1
       get_url:
-          url: "https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2024.12.1-563-amd64.deb"
-          dest: /tmp/rstudio-server-2024.12.1-563-amd64.deb
-          checksum: "sha256:aebdb72344a0600e8952bc47b669ee2c952e4ccb64e253cfc472f1d0c5265f3a"
+          url: "https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2026.01.0-392-amd64.deb"
+          dest: /tmp/rstudio-server-2026.01.0-392-amd64.deb
+          checksum: "sha256:1ef45afe4fff787d45e4c5e0b9bf39e1402f36f88f207506993ac552a28caad8"
     - name: Install RStudio
       when: rstudio_installed.rc != 0 or rstudio_installed.stdout.find("Version") == -1
-      command: gdebi -n /tmp/rstudio-server-2024.12.1-563-amd64.deb
-      register: rstudio_install
+      command: gdebi -n /tmp/rstudio-server-2026.01.0-392-amd64.deb
+      register: rstudio_install_result
     - name: Remove downloaded RStudio package
-      when: rstudio_install.rc == 0
+      when: rstudio_install_result.rc == 0
       file:
-        path: /tmp/rstudio-server-2024.12.1-563-amd64.deb
+        path: /tmp/rstudio-server-2026.01.0-392-amd64.deb
         state: absent
+    - name: Configure RStudio root path for reverse proxy
+      template:
+        src: rserver.conf.j2
+        dest: /etc/rstudio/rserver.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart rstudio
