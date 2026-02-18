@@ -2,7 +2,8 @@
     log {
         output file /var/log/caddy/access.log
     }
-    handle / {
+    handle /* {
+        header Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
         root * /var/www/html
         file_server
     }

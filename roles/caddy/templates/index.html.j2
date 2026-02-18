@@ -1,194 +1,221 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ilifu Training Resource</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <style>
-        .logo { text-align: center; margin-bottom: 1rem; }
-        .logo svg { width: 160px; height: auto; }
-        code.copyable {
-            cursor: pointer;
-            position: relative;
-            display: block;
-        }
-        code.copyable:hover::after {
-            content: "click to copy";
-            position: absolute;
-            right: 0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
-        code.copyable.copied::after {
-            content: "copied!";
-            color: #4ec94e;
-            opacity: 1;
-        }
-        #details { display: none; }
-    </style>
+    <meta name="description" content="ilifu cloud computing training portal — access SSH, JupyterLab, and RStudio environments for data-intensive research.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="container">
-        <header class="logo">
-            <svg width="360" height="200" viewBox="0 0 95.25 52.916666" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ilifu logo">
-                <g>
-                    <path style="fill:#059bda;fill-opacity:1" d="m 9.702848,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 9.702848,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 21.894836,44.898732 h 6.7564 V 7.357533 h -6.7564 z" />
-                    <path style="fill:#059bda;fill-opacity:1" d="m 34.086824,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 34.086824,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 46.482014,44.898732 h 6.7564 V 22.902333 h 3.81 v -5.6388 h -3.81 c 0.0508,-2.5908 0.9144,-3.4036 3.6068,-3.4036 h 0.6096 v -6.4008 c -0.8128,-0.1016 -1.1684,-0.1016 -1.6764,-0.1016 -2.9464,0 -5.334,1.0668 -7.0612,3.1496 -1.3716,1.6256 -1.8796,3.2512 -2.2352,6.7564 h -2.4384 v 5.6388 h 2.4384 z" />
-                    <path style="fill:#023760" d="m 85.547151,16.755533 h -6.756399 v 13.258799 c 0,3.7592 -0.254,5.5372 -1.0668,6.7564 -0.9652,1.6764 -2.8448,2.5908 -5.1308,2.5908 -1.7272,0 -3.048,-0.5588 -3.9624,-1.778 -0.9652,-1.2192 -1.3716,-3.2512 -1.3716,-7.0612 V 16.755533 h -6.7564 v 15.087599 c 0,4.7752 0.5588,7.2644 2.1336,9.5504 1.8796,2.6924 4.8768,4.1656 8.5852,4.1656 3.4036,0 5.4864,-0.8636 8.0772,-3.3528 v 2.6924 h 6.248399 z" />
-                </g>
-            </svg>
+
+    <!-- ── Hero Header ────────────────────────────────────── -->
+    <header class="hero">
+        <div class="hero-content">
+            <a href="https://docs.ilifu.ac.za" title="ilifu Documentation">
+                <img src="ilifu-logo.svg" alt="ilifu logo" class="hero-logo">
+            </a>
             <h1>Welcome to this ilifu training resource</h1>
-        </header>
+            <p>Your gateway to cloud computing for research</p>
+        </div>
+    </header>
 
-        <article aria-label="Password notice">
-            <strong>Need your password?</strong>
-            Ask your course or workshop instructor for your login credentials.
-        </article>
+    <!-- ── Main Content ───────────────────────────────────── -->
+    <main class="container">
 
-{% if jupyter_install or rstudio_install %}
-        <section>
-            <h2>Available Services</h2>
-            <ul>
-{% if jupyter_install %}
-                <li>JupyterLab</li>
-{% endif %}
-{% if rstudio_install %}
-                <li>RStudio</li>
-{% endif %}
-            </ul>
+        <!-- About Section -->
+        <section class="about">
+            <div class="card">
+                <p>
+                    <strong>ilifu</strong> is a cloud computing facility supporting data-intensive
+                    research in astronomy, bioinformatics, and related fields across South Africa.
+                    This portal provides access to your training environment, including SSH terminals,
+                    JupyterLab notebooks, and RStudio sessions. For comprehensive guides and
+                    documentation, visit the
+                    <a href="https://docs.ilifu.ac.za" target="_blank" rel="noopener">ilifu documentation site</a>.
+                </p>
+
+                <!-- Password Banner -->
+                <div class="info-banner" role="alert">
+                    <span class="icon" aria-hidden="true">🔑</span>
+                    <span><strong>Need your password?</strong> Ask your course or workshop instructor for your login credentials.</span>
+                </div>
+            </div>
         </section>
-{% endif %}
 
-        <section>
-            <label for="user-select"><strong>Select your username</strong></label>
-            <select id="user-select">
-                <option value="">-- choose --</option>
+        <!-- User Selector -->
+        <section class="selector-section">
+            <h2><span class="dot" aria-hidden="true"></span> Select your username</h2>
+            <div class="card">
+                <select id="user-select" class="user-select" aria-label="Select your username">
+                    <option value="">— choose your username —</option>
 {% for server in groups["workshop_servers"] %}
 {% for user in hostvars[server].workshop_users %}
-                <option value="{{ user.username }}">{{ user.username }}</option>
+                    <option value="{{ user.username }}">{{ user.username }}</option>
 {% endfor %}
 {% endfor %}
-            </select>
+                </select>
 
-            <div id="details">
-                <div>
-                    <small>SSH command (via ProxyJump through {{ domain_name }})</small>
-                    <code id="ssh-cmd" class="copyable"></code>
-                </div>
+                <div id="connection-details" class="connection-details">
+                    <div class="conn-item">
+                        <span class="conn-label">SSH Command</span>
+                        <code id="ssh-cmd" class="conn-value" role="button" tabindex="0" aria-label="SSH command — click to copy"></code>
+                    </div>
 {% if jupyter_install %}
-                <div>
-                    <small>JupyterLab</small>
-                    <code id="jupyter-url" class="copyable"></code>
-                </div>
+                    <div class="conn-item">
+                        <span class="conn-label">JupyterLab</span>
+                        <code id="jupyter-url" class="conn-value" role="button" tabindex="0" aria-label="JupyterLab URL — click to copy"></code>
+                    </div>
 {% endif %}
 {% if rstudio_install %}
-                <div>
-                    <small>RStudio</small>
-                    <code id="rstudio-url" class="copyable"></code>
+                    <div class="conn-item">
+                        <span class="conn-label">RStudio</span>
+                        <code id="rstudio-url" class="conn-value" role="button" tabindex="0" aria-label="RStudio URL — click to copy"></code>
+                    </div>
+{% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Information Tabs -->
+        <section class="tabs-section">
+            <h2><span class="dot" aria-hidden="true"></span> Getting started</h2>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <nav class="tab-nav" role="tablist" aria-label="Getting started guides">
+                    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cli" id="tab-cli" data-tab="cli">
+                        <span class="tab-icon" aria-hidden="true">⌨️</span>
+                        <span class="tab-label">CLI / SSH</span>
+                    </button>
+{% if jupyter_install %}
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-jupyter" id="tab-jupyter" data-tab="jupyter">
+                        <span class="tab-icon" aria-hidden="true">📓</span>
+                        <span class="tab-label">JupyterLab</span>
+                    </button>
+{% endif %}
+{% if rstudio_install %}
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-rstudio" id="tab-rstudio" data-tab="rstudio">
+                        <span class="tab-icon" aria-hidden="true">📊</span>
+                        <span class="tab-label">RStudio</span>
+                    </button>
+{% endif %}
+                </nav>
+
+                <!-- CLI / SSH Panel -->
+                <div class="tab-panel active" role="tabpanel" id="panel-cli" aria-labelledby="tab-cli" style="padding: 1.5rem;">
+                    <h3>Connecting via SSH</h3>
+                    <p>Select your username above to get a personalised SSH command using a ProxyJump through <code>{{ domain_name }}</code>. Copy the command and paste it into your local terminal.</p>
+
+                    <h3>Persistent sessions with tmux</h3>
+                    <p>Use <kbd>tmux</kbd> to keep terminal sessions running even if you disconnect:</p>
+                    <ul>
+                        <li>Start a new session: <code>tmux new -s work</code></li>
+                        <li>Detach from session: <kbd>Ctrl+b</kbd> then <kbd>d</kbd></li>
+                        <li>Reattach to session: <code>tmux attach -t work</code></li>
+                    </ul>
+
+                    <h3>SSH key authentication</h3>
+                    <p>Copy your SSH key to avoid typing your password each time. You need to do this in two steps:</p>
+                    <ul>
+                        <li>Copy key to the jump host: <code>ssh-copy-id <span class="dyn-user">username</span>@{{ domain_name }}</code></li>
+                        <li>Copy key to the target server: <code>ssh-copy-id -J <span class="dyn-user">username</span>@{{ domain_name }} <span class="dyn-user">username</span>@<span class="dyn-server">server</span></code></li>
+                    </ul>
+
+                    <h3>Storage layout</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Path</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>/users</code></td><td>Your home directory — persistent across sessions</td></tr>
+                            <tr><td><code>/data</code></td><td>Shared course/workshop datasets — typically read-only</td></tr>
+                            <tr><td><code>/scratch</code></td><td>Temporary working space — may be cleaned periodically</td></tr>
+                            <tr><td><code>/software</code></td><td>Shared software and tools</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+{% if jupyter_install %}
+                <!-- JupyterLab Panel -->
+                <div class="tab-panel" role="tabpanel" id="panel-jupyter" aria-labelledby="tab-jupyter" style="padding: 1.5rem;">
+                    <h3>Accessing JupyterLab</h3>
+                    <p>Select your username above, then click the JupyterLab link to open it in a new tab. Log in with your workshop credentials (the same username and password).</p>
+
+                    <h3>The JupyterLab interface</h3>
+                    <p>JupyterLab is a browser-based interactive development environment. Key areas include:</p>
+                    <ul>
+                        <li><strong>File browser</strong> (left sidebar) — navigate and manage your files</li>
+                        <li><strong>Notebook area</strong> (centre) — write and run code in cells</li>
+                        <li><strong>Terminal</strong> — open a terminal from the Launcher for command-line access</li>
+                    </ul>
+
+                    <h3>Working with notebooks</h3>
+                    <ul>
+                        <li>Run a cell: <kbd>Shift</kbd> + <kbd>Enter</kbd></li>
+                        <li>Add a new cell: click the <strong>+</strong> button in the toolbar</li>
+                        <li>Change cell type: use the dropdown to switch between <em>Code</em> and <em>Markdown</em></li>
+                        <li>Save your work frequently with <kbd>Ctrl</kbd> + <kbd>s</kbd></li>
+                    </ul>
+
+                    <h3>Selecting a kernel</h3>
+                    <p>When creating a new notebook, choose the appropriate kernel (e.g. Python 3). You can change kernels later via <strong>Kernel → Change Kernel</strong> in the menu bar.</p>
+                </div>
+{% endif %}
+
+{% if rstudio_install %}
+                <!-- RStudio Panel -->
+                <div class="tab-panel" role="tabpanel" id="panel-rstudio" aria-labelledby="tab-rstudio" style="padding: 1.5rem;">
+                    <h3>Accessing RStudio</h3>
+                    <p>Select your username above, then click the RStudio link to open the RStudio Server interface. Log in with your workshop credentials (the same username and password).</p>
+
+                    <h3>The RStudio interface</h3>
+                    <p>RStudio Server provides a full IDE in your browser with four main panes:</p>
+                    <ul>
+                        <li><strong>Source editor</strong> (top-left) — write and edit R scripts</li>
+                        <li><strong>Console</strong> (bottom-left) — execute R commands interactively</li>
+                        <li><strong>Environment / History</strong> (top-right) — view variables and command history</li>
+                        <li><strong>Files / Plots / Packages</strong> (bottom-right) — manage files and view output</li>
+                    </ul>
+
+                    <h3>Installing packages</h3>
+                    <p>Install R packages using the console:</p>
+                    <p><code>install.packages("tidyverse")</code></p>
+                    <p>Some packages may already be pre-installed. Check with <code>library(packagename)</code>.</p>
+
+                    <h3>Working with data</h3>
+                    <ul>
+                        <li>Upload files using the <strong>Files</strong> pane → <strong>Upload</strong> button</li>
+                        <li>Access shared datasets from <code>/data</code></li>
+                        <li>Save your scripts in <code>/users/yourname</code> to persist between sessions</li>
+                    </ul>
                 </div>
 {% endif %}
             </div>
         </section>
-
-        <hr>
-
-        <details>
-            <summary>SSH Tips</summary>
-            <h3>Persistent sessions with tmux</h3>
-            <p>Use <kbd>tmux</kbd> to keep your terminal sessions running even if you disconnect.</p>
-            <ul>
-                <li>Start a new session: <code>tmux new -s work</code></li>
-                <li>Detach from session: <kbd>Ctrl+b</kbd> then <kbd>d</kbd></li>
-                <li>Reattach to session: <code>tmux attach -t work</code></li>
-            </ul>
-
-            <h3>SSH key authentication</h3>
-            <p>Copy your SSH key to the server to avoid typing your password each time:</p>
-            <code>ssh-copy-id -J <em>username</em>@{{ domain_name }} <em>username</em>@<em>server</em></code>
-        </details>
-
-        <details>
-            <summary>Storage Layout</summary>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Path</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>/users</code></td>
-                        <td>Your home directory &mdash; persistent across sessions</td>
-                    </tr>
-                    <tr>
-                        <td><code>/data</code></td>
-                        <td>Shared course/workshop datasets &mdash; typically read-only</td>
-                    </tr>
-                    <tr>
-                        <td><code>/scratch</code></td>
-                        <td>Temporary working space &mdash; may be cleaned periodically</td>
-                    </tr>
-                    <tr>
-                        <td><code>/software</code></td>
-                        <td>Shared software and tools</td>
-                    </tr>
-                </tbody>
-            </table>
-        </details>
     </main>
 
-    <script>
-        var userData = {
-{% for server in groups["workshop_servers"] %}
-{% for user in hostvars[server].workshop_users %}
-            "{{ user.username }}": "{{ hostvars[server].inventory_hostname_short }}",
-{% endfor %}
-{% endfor %}
-        };
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer class="footer">
+        <p class="footer-label">Supported by</p>
+        <div class="footer-logos">
+            <a href="https://www.idia.ac.za" target="_blank" rel="noopener" class="footer-logo" title="Inter-university Institute for Data Intensive Astronomy">
+                <img src="idia-logo.png" alt="IDIA">
+            </a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <a href="https://www.cbio.uct.ac.za" target="_blank" rel="noopener" class="footer-logo" title="Computational Biology Group">
+                <img src="cbio-logo.png" alt="CBIO">
+            </a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <a href="https://www.uct.ac.za" target="_blank" rel="noopener" class="footer-logo" title="University of Cape Town">
+                <img src="uct-logo.svg" alt="UCT">
+            </a>
+        </div>
+        <p class="footer-copy">© 2026 ilifu — Cloud computing for data-intensive research</p>
+    </footer>
 
-        var domain = "{{ domain_name }}";
-
-        document.getElementById("user-select").addEventListener("change", function () {
-            var username = this.value;
-            var details = document.getElementById("details");
-            if (!username) {
-                details.style.display = "none";
-                return;
-            }
-            var server = userData[username];
-            details.style.display = "block";
-
-            document.getElementById("ssh-cmd").textContent =
-                "ssh -J " + username + "@" + domain + " " + username + "@" + server;
-{% if jupyter_install %}
-            document.getElementById("jupyter-url").innerHTML =
-                '<a href="https://' + domain + '/' + server + '/jupyter/" target="_blank">https://' + domain + '/' + server + '/jupyter/</a>';
-{% endif %}
-{% if rstudio_install %}
-            document.getElementById("rstudio-url").innerHTML =
-                '<a href="https://' + domain + '/' + server + '/rstudio/" target="_blank">https://' + domain + '/' + server + '/rstudio/</a>';
-{% endif %}
-        });
-
-        document.addEventListener("click", function (e) {
-            if (e.target.tagName === "A") return;
-            var el = e.target.closest("code.copyable");
-            if (!el) return;
-            var text = el.textContent;
-            if (!navigator.clipboard) return;
-            navigator.clipboard.writeText(text).then(function () {
-                el.classList.add("copied");
-                setTimeout(function () { el.classList.remove("copied"); }, 1500);
-            });
-        });
-    </script>
+    <!-- ── JavaScript ─────────────────────────────────────── -->
+    <script src="main.js"></script>
 </body>
 </html>
