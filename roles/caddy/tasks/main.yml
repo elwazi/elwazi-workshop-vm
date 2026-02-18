@@ -64,6 +64,14 @@
         group: www-data
         mode: 0755
 
+    - name: Deploy logo SVG
+      copy:
+          src: ../templates/ilifu-logo.svg
+          dest: /var/www/html/ilifu-logo.svg
+          owner: www-data
+          group: www-data
+          mode: 0644
+
     - name: Create welcome page
       template:
           src: index.html.j2
