@@ -106,7 +106,26 @@ This will create:
 - An inventory file `inventory.yaml` used by ansible to setup the nodes.
 - A tab-separated file `users.tsv` with login details for each user.
 
-Check the inventory for the IP address of the `login_node`. You will need to set the DNS to point at this IP address.
+## Configure DNS
+
+Before running ansible, you **must** create a DNS A record pointing your `login_domain_name` to the public IP of the login node.
+
+Find the login node's public IP in `inventory.yaml`:
+```bash
+grep -A3 login_servers inventory.yaml
+```
+
+Create an A record with your DNS provider:
+```
+<your login_domain_name>  →  <login node public IP>
+```
+
+> **Important:** Caddy (the reverse proxy) uses this domain to automatically provision TLS certificates via Let's Encrypt. If DNS is not configured correctly before running ansible, Caddy will fail to obtain certificates and the landing page will not be accessible over HTTPS.
+
+Wait for the DNS record to propagate before proceeding. You can verify with:
+```bash
+dig +short <your login_domain_name>
+```
 
 ## Run `ansible-playbook` to setup the nodes
 
