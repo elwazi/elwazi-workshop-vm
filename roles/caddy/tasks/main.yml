@@ -64,18 +64,32 @@
         group: www-data
         mode: 0755
 
-    - name: Deploy logo SVG
+    - name: Deploy static assets (logos)
       copy:
-          src: ../templates/ilifu-logo.svg
-          dest: /var/www/html/ilifu-logo.svg
+          src: "{{ item }}"
+          dest: "/var/www/html/{{ item }}"
           owner: www-data
           group: www-data
           mode: 0644
+      loop:
+        - style.css
+        - ilifu-logo.svg
+        - idia-logo.png
+        - cbio-logo.png
+        - uct-logo.svg
 
     - name: Create welcome page
       template:
           src: index.html.j2
           dest: /var/www/html/index.html
+          owner: www-data
+          group: www-data
+          mode: 0644
+
+    - name: Create main.js from template
+      template:
+          src: main.js.j2
+          dest: /var/www/html/main.js
           owner: www-data
           group: www-data
           mode: 0644
