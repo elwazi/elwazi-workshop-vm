@@ -1,151 +1,776 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ilifu Training Resource</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <meta name="description" content="ilifu cloud computing training portal — access SSH, JupyterLab, and RStudio environments for data-intensive research.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .logo { text-align: center; margin-bottom: 1rem; }
-        .logo svg { width: 160px; height: auto; }
-        code.copyable {
-            cursor: pointer;
+        /* ── Reset & Base ─────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy: #023760;
+            --navy-dark: #011e38;
+            --blue: #059bda;
+            --blue-light: #3db8eb;
+            --blue-glow: rgba(5, 155, 218, 0.25);
+            --bg: #f4f7fa;
+            --card-bg: #ffffff;
+            --text: #1a2a3a;
+            --text-muted: #5a6a7a;
+            --border: #dfe6ed;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 2px 12px rgba(2, 55, 96, 0.08);
+            --shadow-lg: 0 8px 32px rgba(2, 55, 96, 0.12);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Hero Header ──────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, #04567a 100%);
+            padding: 3rem 2rem 3.5rem;
+            text-align: center;
             position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(5, 155, 218, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(5, 155, 218, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            width: 140px;
+            height: auto;
+            margin-bottom: 1rem;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            transition: opacity var(--transition);
+        }
+
+        .hero-logo:hover { opacity: 1; }
+
+        .hero h1 {
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        /* ── Container ────────────────────────────────────────── */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ── About Section ────────────────────────────────────── */
+        .about {
+            margin-top: -1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .about .card {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .about p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .about a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+
+        .about a:hover {
+            color: var(--blue-light);
+            text-decoration: underline;
+        }
+
+        /* ── Info Banner ──────────────────────────────────────── */
+        .info-banner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, rgba(5, 155, 218, 0.08), rgba(5, 155, 218, 0.04));
+            border: 1px solid rgba(5, 155, 218, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .info-banner .icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .info-banner strong { color: var(--navy); }
+
+        /* ── User Selector Card ───────────────────────────────── */
+        .selector-section {
+            margin-top: 2rem;
+        }
+
+        .selector-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .selector-section h2 .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .user-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a6a7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .user-select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px var(--blue-glow);
+        }
+
+        /* ── Connection Details ────────────────────────────────── */
+        .connection-details {
+            display: none;
+            margin-top: 1.25rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .connection-details.visible {
             display: block;
         }
-        code.copyable:hover::after {
-            content: "click to copy";
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .conn-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.85rem 1rem;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.6rem;
+            border: 1px solid var(--border);
+            transition: border-color var(--transition);
+        }
+
+        .conn-item:hover {
+            border-color: var(--blue);
+        }
+
+        .conn-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .conn-value {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: var(--navy);
+            cursor: pointer;
+            position: relative;
+            word-break: break-all;
+            padding: 0.4rem 0.6rem;
+            background: var(--card-bg);
+            border-radius: 4px;
+            border: 1px dashed var(--border);
+            transition: background var(--transition), border-color var(--transition);
+        }
+
+        .conn-value:hover {
+            background: rgba(5, 155, 218, 0.05);
+            border-color: var(--blue);
+        }
+
+        .conn-value::after {
+            content: 'click to copy';
             position: absolute;
             right: 0.5rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.7rem;
-            opacity: 0.6;
+            font-size: 0.65rem;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity var(--transition);
         }
-        code.copyable.copied::after {
-            content: "copied!";
-            color: #4ec94e;
+
+        .conn-value:hover::after { opacity: 1; }
+
+        .conn-value.copied {
+            background: rgba(46, 204, 113, 0.08);
+            border-color: #2ecc71;
+        }
+
+        .conn-value.copied::after {
+            content: 'copied ✓';
+            color: #2ecc71;
             opacity: 1;
         }
-        #details { display: none; }
+
+        .conn-value a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .conn-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Tabs Section ─────────────────────────────────────── */
+        .tabs-section {
+            margin-top: 2rem;
+        }
+
+        .tabs-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tabs-section h2 .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color var(--transition), border-color var(--transition), background var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--navy);
+            background: rgba(5, 155, 218, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+        }
+
+        .tab-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .tab-panel {
+            display: none;
+            padding: 1.5rem 0.25rem;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .tab-panel.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .tab-panel h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.6rem;
+            margin-top: 1.2rem;
+        }
+
+        .tab-panel h3:first-child { margin-top: 0; }
+
+        .tab-panel p,
+        .tab-panel li {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .tab-panel ul {
+            margin: 0.5rem 0 0.75rem 1.25rem;
+        }
+
+        .tab-panel li {
+            margin-bottom: 0.3rem;
+        }
+
+        .tab-panel code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.82rem;
+            background: var(--bg);
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--navy);
+        }
+
+        .tab-panel kbd {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.78rem;
+            background: var(--navy);
+            color: #fff;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .tab-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .tab-panel th {
+            text-align: left;
+            font-weight: 600;
+            color: var(--navy);
+            padding: 0.6rem 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-panel td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .tab-panel td code {
+            font-weight: 500;
+        }
+
+        .dyn-user, .dyn-server {
+            font-style: italic;
+            transition: color var(--transition);
+        }
+
+        .dyn-user.filled, .dyn-server.filled {
+            font-style: normal;
+            font-weight: 600;
+            color: var(--blue);
+        }
+
+        /* ── Footer ───────────────────────────────────────────── */
+        .footer {
+            margin-top: 3rem;
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .footer-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 1.25rem;
+        }
+
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            transition: color var(--transition), transform var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .footer-logo:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .footer-logo .logo-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+
+        .footer-logo .logo-sub {
+            font-size: 0.6rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            opacity: 0.6;
+            text-transform: none;
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .footer-copy {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ── Responsive ───────────────────────────────────────── */
+        @media (max-width: 640px) {
+            .hero { padding: 2rem 1.5rem 2.5rem; }
+            .hero h1 { font-size: 1.35rem; }
+            .container { padding: 0 1rem; }
+            .card { padding: 1.25rem; }
+            .tab-btn { font-size: 0.78rem; padding: 0.7rem 0.5rem; }
+            .tab-btn .tab-label { display: none; }
+            .tab-icon { font-size: 1.3rem; }
+            .footer-logos { gap: 1.5rem; }
+            .footer-logo .logo-text { font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
-    <main class="container">
-        <header class="logo">
-            <svg width="360" height="200" viewBox="0 0 95.25 52.916666" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ilifu logo">
-                <g>
-                    <path style="fill:#059bda;fill-opacity:1" d="m 9.702848,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 9.702848,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 21.894836,44.898732 h 6.7564 V 7.357533 h -6.7564 z" />
-                    <path style="fill:#059bda;fill-opacity:1" d="m 34.086824,13.707533 h 6.7564 v -6.35 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 34.086824,44.898732 h 6.7564 V 16.755533 h -6.7564 z" />
-                    <path style="fill:#023760" d="m 46.482014,44.898732 h 6.7564 V 22.902333 h 3.81 v -5.6388 h -3.81 c 0.0508,-2.5908 0.9144,-3.4036 3.6068,-3.4036 h 0.6096 v -6.4008 c -0.8128,-0.1016 -1.1684,-0.1016 -1.6764,-0.1016 -2.9464,0 -5.334,1.0668 -7.0612,3.1496 -1.3716,1.6256 -1.8796,3.2512 -2.2352,6.7564 h -2.4384 v 5.6388 h 2.4384 z" />
-                    <path style="fill:#023760" d="m 85.547151,16.755533 h -6.756399 v 13.258799 c 0,3.7592 -0.254,5.5372 -1.0668,6.7564 -0.9652,1.6764 -2.8448,2.5908 -5.1308,2.5908 -1.7272,0 -3.048,-0.5588 -3.9624,-1.778 -0.9652,-1.2192 -1.3716,-3.2512 -1.3716,-7.0612 V 16.755533 h -6.7564 v 15.087599 c 0,4.7752 0.5588,7.2644 2.1336,9.5504 1.8796,2.6924 4.8768,4.1656 8.5852,4.1656 3.4036,0 5.4864,-0.8636 8.0772,-3.3528 v 2.6924 h 6.248399 z" />
-                </g>
-            </svg>
+
+    <!-- ── Hero Header ────────────────────────────────────── -->
+    <header class="hero">
+        <div class="hero-content">
+            <a href="https://docs.ilifu.ac.za" title="ilifu Documentation">
+                <img src="ilifu-logo.svg" alt="ilifu logo" class="hero-logo">
+            </a>
             <h1>Welcome to this ilifu training resource</h1>
-        </header>
+            <p>Your gateway to cloud computing for research</p>
+        </div>
+    </header>
 
-        <article aria-label="Password notice">
-            <strong>Need your password?</strong>
-            Ask your course or workshop instructor for your login credentials.
-        </article>
+    <!-- ── Main Content ───────────────────────────────────── -->
+    <main class="container">
 
-{% if jupyter_install or rstudio_install %}
-        <section>
-            <h2>Available Services</h2>
-            <ul>
-{% if jupyter_install %}
-                <li>JupyterLab</li>
-{% endif %}
-{% if rstudio_install %}
-                <li>RStudio</li>
-{% endif %}
-            </ul>
+        <!-- About Section -->
+        <section class="about">
+            <div class="card">
+                <p>
+                    <strong>ilifu</strong> is a cloud computing facility supporting data-intensive
+                    research in astronomy, bioinformatics, and related fields across South Africa.
+                    This portal provides access to your training environment, including SSH terminals,
+                    JupyterLab notebooks, and RStudio sessions. For comprehensive guides and
+                    documentation, visit the
+                    <a href="https://docs.ilifu.ac.za" target="_blank" rel="noopener">ilifu documentation site</a>.
+                </p>
+
+                <!-- Password Banner -->
+                <div class="info-banner" role="alert">
+                    <span class="icon" aria-hidden="true">🔑</span>
+                    <span><strong>Need your password?</strong> Ask your course or workshop instructor for your login credentials.</span>
+                </div>
+            </div>
         </section>
-{% endif %}
 
-        <section>
-            <label for="user-select"><strong>Select your username</strong></label>
-            <select id="user-select">
-                <option value="">-- choose --</option>
+        <!-- User Selector -->
+        <section class="selector-section">
+            <h2><span class="dot" aria-hidden="true"></span> Select your username</h2>
+            <div class="card">
+                <select id="user-select" class="user-select" aria-label="Select your username">
+                    <option value="">— choose your username —</option>
 {% for server in groups["workshop_servers"] %}
 {% for user in hostvars[server].workshop_users %}
-                <option value="{{ user.username }}">{{ user.username }}</option>
+                    <option value="{{ user.username }}">{{ user.username }}</option>
 {% endfor %}
 {% endfor %}
-            </select>
+                </select>
 
-            <div id="details">
-                <div>
-                    <small>SSH command (via ProxyJump through {{ domain_name }})</small>
-                    <code id="ssh-cmd" class="copyable"></code>
-                </div>
+                <div id="connection-details" class="connection-details">
+                    <div class="conn-item">
+                        <span class="conn-label">SSH Command</span>
+                        <code id="ssh-cmd" class="conn-value" role="button" tabindex="0" aria-label="SSH command — click to copy"></code>
+                    </div>
 {% if jupyter_install %}
-                <div>
-                    <small>JupyterLab</small>
-                    <code id="jupyter-url" class="copyable"></code>
-                </div>
+                    <div class="conn-item">
+                        <span class="conn-label">JupyterLab</span>
+                        <code id="jupyter-url" class="conn-value" role="button" tabindex="0" aria-label="JupyterLab URL — click to copy"></code>
+                    </div>
 {% endif %}
 {% if rstudio_install %}
-                <div>
-                    <small>RStudio</small>
-                    <code id="rstudio-url" class="copyable"></code>
+                    <div class="conn-item">
+                        <span class="conn-label">RStudio</span>
+                        <code id="rstudio-url" class="conn-value" role="button" tabindex="0" aria-label="RStudio URL — click to copy"></code>
+                    </div>
+{% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Information Tabs -->
+        <section class="tabs-section">
+            <h2><span class="dot" aria-hidden="true"></span> Getting started</h2>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <nav class="tab-nav" role="tablist" aria-label="Getting started guides">
+                    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-cli" id="tab-cli" data-tab="cli">
+                        <span class="tab-icon" aria-hidden="true">⌨️</span>
+                        <span class="tab-label">CLI / SSH</span>
+                    </button>
+{% if jupyter_install %}
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-jupyter" id="tab-jupyter" data-tab="jupyter">
+                        <span class="tab-icon" aria-hidden="true">📓</span>
+                        <span class="tab-label">JupyterLab</span>
+                    </button>
+{% endif %}
+{% if rstudio_install %}
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-rstudio" id="tab-rstudio" data-tab="rstudio">
+                        <span class="tab-icon" aria-hidden="true">📊</span>
+                        <span class="tab-label">RStudio</span>
+                    </button>
+{% endif %}
+                </nav>
+
+                <!-- CLI / SSH Panel -->
+                <div class="tab-panel active" role="tabpanel" id="panel-cli" aria-labelledby="tab-cli" style="padding: 1.5rem;">
+                    <h3>Connecting via SSH</h3>
+                    <p>Select your username above to get a personalised SSH command using a ProxyJump through <code>{{ domain_name }}</code>. Copy the command and paste it into your local terminal.</p>
+
+                    <h3>Persistent sessions with tmux</h3>
+                    <p>Use <kbd>tmux</kbd> to keep terminal sessions running even if you disconnect:</p>
+                    <ul>
+                        <li>Start a new session: <code>tmux new -s work</code></li>
+                        <li>Detach from session: <kbd>Ctrl+b</kbd> then <kbd>d</kbd></li>
+                        <li>Reattach to session: <code>tmux attach -t work</code></li>
+                    </ul>
+
+                    <h3>SSH key authentication</h3>
+                    <p>Copy your SSH key to avoid typing your password each time. You need to do this in two steps:</p>
+                    <ul>
+                        <li>Copy key to the jump host: <code>ssh-copy-id <span class="dyn-user">username</span>@{{ domain_name }}</code></li>
+                        <li>Copy key to the target server: <code>ssh-copy-id -J <span class="dyn-user">username</span>@{{ domain_name }} <span class="dyn-user">username</span>@<span class="dyn-server">server</span></code></li>
+                    </ul>
+
+                    <h3>Storage layout</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Path</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>/users</code></td><td>Your home directory — persistent across sessions</td></tr>
+                            <tr><td><code>/data</code></td><td>Shared course/workshop datasets — typically read-only</td></tr>
+                            <tr><td><code>/scratch</code></td><td>Temporary working space — may be cleaned periodically</td></tr>
+                            <tr><td><code>/software</code></td><td>Shared software and tools</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+{% if jupyter_install %}
+                <!-- JupyterLab Panel -->
+                <div class="tab-panel" role="tabpanel" id="panel-jupyter" aria-labelledby="tab-jupyter" style="padding: 1.5rem;">
+                    <h3>Accessing JupyterLab</h3>
+                    <p>Select your username above, then click the JupyterLab link to open it in a new tab. Log in with your workshop credentials (the same username and password).</p>
+
+                    <h3>The JupyterLab interface</h3>
+                    <p>JupyterLab is a browser-based interactive development environment. Key areas include:</p>
+                    <ul>
+                        <li><strong>File browser</strong> (left sidebar) — navigate and manage your files</li>
+                        <li><strong>Notebook area</strong> (centre) — write and run code in cells</li>
+                        <li><strong>Terminal</strong> — open a terminal from the Launcher for command-line access</li>
+                    </ul>
+
+                    <h3>Working with notebooks</h3>
+                    <ul>
+                        <li>Run a cell: <kbd>Shift</kbd> + <kbd>Enter</kbd></li>
+                        <li>Add a new cell: click the <strong>+</strong> button in the toolbar</li>
+                        <li>Change cell type: use the dropdown to switch between <em>Code</em> and <em>Markdown</em></li>
+                        <li>Save your work frequently with <kbd>Ctrl</kbd> + <kbd>s</kbd></li>
+                    </ul>
+
+                    <h3>Selecting a kernel</h3>
+                    <p>When creating a new notebook, choose the appropriate kernel (e.g. Python 3). You can change kernels later via <strong>Kernel → Change Kernel</strong> in the menu bar.</p>
+                </div>
+{% endif %}
+
+{% if rstudio_install %}
+                <!-- RStudio Panel -->
+                <div class="tab-panel" role="tabpanel" id="panel-rstudio" aria-labelledby="tab-rstudio" style="padding: 1.5rem;">
+                    <h3>Accessing RStudio</h3>
+                    <p>Select your username above, then click the RStudio link to open the RStudio Server interface. Log in with your workshop credentials (the same username and password).</p>
+
+                    <h3>The RStudio interface</h3>
+                    <p>RStudio Server provides a full IDE in your browser with four main panes:</p>
+                    <ul>
+                        <li><strong>Source editor</strong> (top-left) — write and edit R scripts</li>
+                        <li><strong>Console</strong> (bottom-left) — execute R commands interactively</li>
+                        <li><strong>Environment / History</strong> (top-right) — view variables and command history</li>
+                        <li><strong>Files / Plots / Packages</strong> (bottom-right) — manage files and view output</li>
+                    </ul>
+
+                    <h3>Installing packages</h3>
+                    <p>Install R packages using the console:</p>
+                    <p><code>install.packages("tidyverse")</code></p>
+                    <p>Some packages may already be pre-installed. Check with <code>library(packagename)</code>.</p>
+
+                    <h3>Working with data</h3>
+                    <ul>
+                        <li>Upload files using the <strong>Files</strong> pane → <strong>Upload</strong> button</li>
+                        <li>Access shared datasets from <code>/data</code></li>
+                        <li>Save your scripts in <code>/users/yourname</code> to persist between sessions</li>
+                    </ul>
                 </div>
 {% endif %}
             </div>
         </section>
-
-        <hr>
-
-        <details>
-            <summary>SSH Tips</summary>
-            <h3>Persistent sessions with tmux</h3>
-            <p>Use <kbd>tmux</kbd> to keep your terminal sessions running even if you disconnect.</p>
-            <ul>
-                <li>Start a new session: <code>tmux new -s work</code></li>
-                <li>Detach from session: <kbd>Ctrl+b</kbd> then <kbd>d</kbd></li>
-                <li>Reattach to session: <code>tmux attach -t work</code></li>
-            </ul>
-
-            <h3>SSH key authentication</h3>
-            <p>Copy your SSH key to the server to avoid typing your password each time:</p>
-            <code>ssh-copy-id -J <em>username</em>@{{ domain_name }} <em>username</em>@<em>server</em></code>
-        </details>
-
-        <details>
-            <summary>Storage Layout</summary>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Path</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>/users</code></td>
-                        <td>Your home directory &mdash; persistent across sessions</td>
-                    </tr>
-                    <tr>
-                        <td><code>/data</code></td>
-                        <td>Shared course/workshop datasets &mdash; typically read-only</td>
-                    </tr>
-                    <tr>
-                        <td><code>/scratch</code></td>
-                        <td>Temporary working space &mdash; may be cleaned periodically</td>
-                    </tr>
-                    <tr>
-                        <td><code>/software</code></td>
-                        <td>Shared software and tools</td>
-                    </tr>
-                </tbody>
-            </table>
-        </details>
     </main>
 
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer class="footer">
+        <p class="footer-label">Supported by</p>
+        <div class="footer-logos">
+            <a href="https://www.idia.ac.za" target="_blank" rel="noopener" class="footer-logo" title="Inter-university Institute for Data Intensive Astronomy">
+                <span class="logo-text">IDIA</span>
+                <span class="logo-sub">Data Intensive Astronomy</span>
+            </a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <a href="https://www.cbio.uct.ac.za" target="_blank" rel="noopener" class="footer-logo" title="Computational Biology Group">
+                <span class="logo-text">CBIO</span>
+                <span class="logo-sub">Computational Biology</span>
+            </a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <a href="https://www.uct.ac.za" target="_blank" rel="noopener" class="footer-logo" title="University of Cape Town">
+                <span class="logo-text">UCT</span>
+                <span class="logo-sub">University of Cape Town</span>
+            </a>
+        </div>
+        <p class="footer-copy">© 2026 ilifu — Cloud computing for data-intensive research</p>
+    </footer>
+
+    <!-- ── JavaScript ─────────────────────────────────────── -->
     <script>
+        /* ── User data from Ansible template ──────────────── */
         var userData = {
 {% for server in groups["workshop_servers"] %}
 {% for user in hostvars[server].workshop_users %}
@@ -156,15 +781,19 @@
 
         var domain = "{{ domain_name }}";
 
+        /* ── User selector ────────────────────────────────── */
         document.getElementById("user-select").addEventListener("change", function () {
             var username = this.value;
-            var details = document.getElementById("details");
+            var details = document.getElementById("connection-details");
             if (!username) {
-                details.style.display = "none";
+                details.classList.remove("visible");
+                /* Reset dynamic placeholders */
+                document.querySelectorAll(".dyn-user").forEach(function (el) { el.textContent = "username"; el.classList.remove("filled"); });
+                document.querySelectorAll(".dyn-server").forEach(function (el) { el.textContent = "server"; el.classList.remove("filled"); });
                 return;
             }
             var server = userData[username];
-            details.style.display = "block";
+            details.classList.add("visible");
 
             document.getElementById("ssh-cmd").textContent =
                 "ssh -J " + username + "@" + domain + " " + username + "@" + server;
@@ -176,17 +805,42 @@
             document.getElementById("rstudio-url").innerHTML =
                 '<a href="https://' + domain + '/' + server + '/rstudio/" target="_blank">https://' + domain + '/' + server + '/rstudio/</a>';
 {% endif %}
+
+            /* Update dynamic placeholders in tab content */
+            document.querySelectorAll(".dyn-user").forEach(function (el) { el.textContent = username; el.classList.add("filled"); });
+            document.querySelectorAll(".dyn-server").forEach(function (el) { el.textContent = server; el.classList.add("filled"); });
         });
 
+        /* ── Copy to clipboard ────────────────────────────── */
         document.addEventListener("click", function (e) {
             if (e.target.tagName === "A") return;
-            var el = e.target.closest("code.copyable");
+            var el = e.target.closest(".conn-value");
             if (!el) return;
             var text = el.textContent;
             if (!navigator.clipboard) return;
             navigator.clipboard.writeText(text).then(function () {
                 el.classList.add("copied");
                 setTimeout(function () { el.classList.remove("copied"); }, 1500);
+            });
+        });
+
+        /* ── Tab switching ────────────────────────────────── */
+        document.querySelectorAll(".tab-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var tab = this.getAttribute("data-tab");
+
+                document.querySelectorAll(".tab-btn").forEach(function (b) {
+                    b.classList.remove("active");
+                    b.setAttribute("aria-selected", "false");
+                });
+                this.classList.add("active");
+                this.setAttribute("aria-selected", "true");
+
+                document.querySelectorAll(".tab-panel").forEach(function (p) {
+                    p.classList.remove("active");
+                });
+                var panel = document.getElementById("panel-" + tab);
+                if (panel) panel.classList.add("active");
             });
         });
     </script>
